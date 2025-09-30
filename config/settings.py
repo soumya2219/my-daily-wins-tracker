@@ -27,20 +27,12 @@ else:
 # First try to load from environment, then fall back to safe defaults for development
 DEBUG = os.environ.get("DEBUG", "True").lower() in ("true", "1", "yes")
 
-# For Heroku debugging - temporarily set DEBUG=True to see detailed errors
-# Remove this after debugging
-if os.environ.get("DATABASE_URL") and not DEBUG:
-    # We're on Heroku but DEBUG is False, let's see detailed errors
-    DEBUG = True  # TEMPORARY - remove after fixing
-
 SECRET_KEY = os.environ.get("SECRET_KEY")
 if not SECRET_KEY:
     # Always use development key locally, production will have environment variable
     SECRET_KEY = "dev-insecure-secret-key-change-me-&+@742w_we^4l&%ynworzhua%0(e7wt8a9r+70zzc1fwul6z#t"
     if not DEBUG:
         print("WARNING: Using development SECRET_KEY in production!")
-
-# Remove debug prints for cleaner output
 
 # ALLOWED_HOSTS: hostnames only (no http/https). Comma-separated env supported.
 _raw_hosts = os.environ.get("ALLOWED_HOSTS", "")
