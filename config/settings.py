@@ -37,9 +37,20 @@ ALLOWED_HOSTS = [h.strip() for h in _raw_hosts.split(",") if h.strip()] or [
 
 # CSRF_TRUSTED_ORIGINS: must include scheme; comma-separated env supported.
 _raw_csrf = os.environ.get("CSRF_TRUSTED_ORIGINS", "")
-CSRF_TRUSTED_ORIGINS = [o.strip() for o in _raw_csrf.split(",") if o.strip()] or [
-    "https://my-daily-wins-tracker-b04493bdcdbc.herokuapp.com",
-]
+CSRF_TRUSTED_ORIGINS = []
+if _raw_csrf:
+    for origin in _raw_csrf.split(","):
+        origin = origin.strip()
+        if origin:
+            # Ensure the origin starts with a scheme
+            if not origin.startswith(('http://', 'https://')):
+                origin = f'https://{origin}'
+            CSRF_TRUSTED_ORIGINS.append(origin)
+else:
+    # Default trusted origins for production
+    CSRF_TRUSTED_ORIGINS = [
+        "https://my-daily-wins-tracker-b04493bdcdbc.herokuapp.com",
+    ]
 
 # Make Django aware it’s behind Heroku’s proxy & SSL
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
