@@ -25,7 +25,13 @@ else:
 # Security
 # -------------------------
 # First try to load from environment, then fall back to safe defaults for development
-DEBUG = os.environ.get("DEBUG", "True").lower() == "true"  # Default to True for development
+DEBUG = os.environ.get("DEBUG", "True").lower() in ("true", "1", "yes")
+
+# For Heroku debugging - temporarily set DEBUG=True to see detailed errors
+# Remove this after debugging
+if os.environ.get("DATABASE_URL") and not DEBUG:
+    # We're on Heroku but DEBUG is False, let's see detailed errors
+    DEBUG = True  # TEMPORARY - remove after fixing
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 if not SECRET_KEY:
