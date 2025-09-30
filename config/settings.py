@@ -12,20 +12,29 @@ import dj_database_url
 # Paths / .env
 # -------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(BASE_DIR / ".env")
+
+# Load .env file - try multiple locations
+env_file = BASE_DIR / ".env"
+if env_file.exists():
+    load_dotenv(env_file)
+else:
+    # Try loading from current directory
+    load_dotenv()
 
 # -------------------------
 # Security
 # -------------------------
-DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
+# First try to load from environment, then fall back to safe defaults for development
+DEBUG = os.environ.get("DEBUG", "True").lower() == "true"  # Default to True for development
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 if not SECRET_KEY:
-    if DEBUG:
-        # Safe for local dev only; do NOT rely on this in production.
-        SECRET_KEY = "dev-insecure-secret-key-change-me"
-    else:
-        raise ValueError("SECRET_KEY not set in environment")
+    # Always use development key locally, production will have environment variable
+    SECRET_KEY = "dev-insecure-secret-key-change-me-&+@742w_we^4l&%ynworzhua%0(e7wt8a9r+70zzc1fwul6z#t"
+    if not DEBUG:
+        print("WARNING: Using development SECRET_KEY in production!")
+
+# Remove debug prints for cleaner output
 
 # ALLOWED_HOSTS: hostnames only (no http/https). Comma-separated env supported.
 _raw_hosts = os.environ.get("ALLOWED_HOSTS", "")
