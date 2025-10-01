@@ -1,0 +1,266 @@
+{% load widget_tweaks %}
+
+<div class="modal-header bg-primary text-white">
+    <h5 class="modal-title">
+        <i class="fas fa-edit me-2"></i>
+        {% if created %}
+            Add Entry for {{ entry_date|date:"F j, Y" }}
+        {% else %}
+            Edit Entry for {{ entry_date|date:"F j, Y" }}
+        {% endif %}
+    </h5>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+</div>
+
+<div class="modal-body">
+    <form id="entry-form" method="post">
+        {% csrf_token %}
+        
+        <!-- Title Section -->
+        <div class="form-floating mb-3">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-floating">
+                        {{ form.title|add_class:"form-control" }}
+                        <label for="{{ form.title.id_for_label }}">
+                            <i class="fas fa-lightbulb text-warning me-2"></i>
+                            <strong>{{ form.title.label }}</strong>
+                        </label>
+                        {% if form.title.help_text %}
+                        <div class="form-text">{{ form.title.help_text }}</div>
+                        {% endif %}
+                        {% if form.title.errors %}
+                        <div class="text-danger small">{{ form.title.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Section -->
+        <div class="form-floating mb-3">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-floating">
+                        {{ form.content|add_class:"form-control" }}
+                        <label for="{{ form.content.id_for_label }}">
+                            <i class="fas fa-pen text-info me-2"></i>
+                            <strong>{{ form.content.label }}</strong>
+                        </label>
+                        {% if form.content.help_text %}
+                        <div class="form-text">{{ form.content.help_text }}</div>
+                        {% endif %}
+                        {% if form.content.errors %}
+                        <div class="text-danger small">{{ form.content.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mood Rating Section -->
+        <div class="form-floating mb-3">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-floating">
+                        {{ form.mood_rating|add_class:"form-select" }}
+                        <label for="{{ form.mood_rating.id_for_label }}">
+                            <i class="fas fa-smile text-success me-2"></i>
+                            <strong>{{ form.mood_rating.label }}</strong>
+                        </label>
+                        {% if form.mood_rating.help_text %}
+                        <div class="form-text">{{ form.mood_rating.help_text }}</div>
+                        {% endif %}
+                        {% if form.mood_rating.errors %}
+                        <div class="text-danger small">{{ form.mood_rating.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Categories Section -->
+            <div class="form-group mb-3">
+                <div class="row">
+                    <div class="col-md-12">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="form-label mb-0">
+                            <i class="fas fa-tags text-secondary me-2"></i>
+                            <strong>Categories</strong>
+                        </label>
+                        <button type="button" class="btn btn-outline-primary btn-sm" id="manageCategoriesBtn" style="white-space: nowrap;">
+                            <i class="fas fa-cog me-1"></i>Manage
+                        </button>
+                    </div>
+                    
+                    <!-- Custom categories rendering -->
+                    <div class="category-checkboxes-custom">
+                        {% for category in form.categories.field.queryset %}
+                            <div class="category-item">
+                                <input 
+                                    type="checkbox" 
+                                    id="id_categories_{{ category.id }}" 
+                                    name="categories" 
+                                    value="{{ category.id }}"
+                                    class="category-checkbox"
+                                    {% if category.id in form.categories.value %}checked{% endif %}>
+                                <label for="id_categories_{{ category.id }}" class="category-label">
+                                    <span class="category-color-dot" style="background-color: {{ category.color }};"></span>
+                                    {{ category.name }}
+                                </label>
+                            </div>
+                        {% empty %}
+                            <div class="no-categories-message">
+                                <i class="fas fa-info-circle text-muted me-2"></i>
+                                <span class="text-muted">No categories yet. Click "Manage" to create some!</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    {% if form.categories.help_text %}
+                        <div class="form-text">{{ form.categories.help_text }}</div>
+                    {% endif %}
+                    {% if form.categories.errors %}
+                        <div class="text-danger small">{{ form.categories.errors.0 }}</div>
+                    {% endif %}
+                    
+                    <div class="mt-2">
+                        <small class="text-muted">Select categories that apply to this entry</small>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+        <i class="fas fa-times me-2"></i>Cancel
+    </button>
+    <button type="submit" form="entry-form" class="btn btn-primary">
+        <i class="fas fa-save me-2"></i>
+        {% if created %}Save Entry{% else %}Update Entry{% endif %}
+    </button>
+</div>
+
+<style>
+.category-checkboxes-custom {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 8px;
+    background-color: #f8f9fa;
+}
+
+.category-checkboxes-custom .category-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    margin: 4px 0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.category-checkboxes-custom .category-item:hover {
+    background-color: #e9ecef;
+    border-color: #ced4da;
+}
+
+.category-checkboxes-custom .category-checkbox {
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.category-checkboxes-custom .category-label {
+    margin: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    flex-grow: 1;
+}
+
+.category-color-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+    flex-shrink: 0;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px #dee2e6;
+}
+
+.no-categories-message {
+    padding: 20px;
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.category-color-circle {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 8px;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px #dee2e6;
+}
+</style>
+
+<!-- Category Management Modal -->
+<div class="modal fade" id="categoryManagerModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-tags me-2"></i>Manage Categories
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Quick add category form -->
+                <div class="quick-category-form mb-3" id="quickCategoryForm" style="display: none;">
+                    <h6><i class="fas fa-plus me-2"></i>Add New Category</h6>
+                    <div class="row">
+                        <div class="col-8">
+                            <input type="text" class="form-control" id="categoryName" placeholder="Category name">
+                        </div>
+                        <div class="col-4">
+                            <input type="color" class="form-control form-control-color" id="categoryColor" value="#007bff">
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <button type="button" class="btn btn-success btn-sm" onclick="createCategory()">
+                            <i class="fas fa-plus me-1"></i>Create
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-sm ms-2" onclick="toggleCategoryForm()">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Category list -->
+                <div id="category-list">
+                    <!-- Categories will be loaded here via AJAX -->
+                </div>
+
+                <!-- Add category button -->
+                <div class="text-center mt-3">
+                    <button type="button" class="btn btn-outline-primary" onclick="toggleCategoryForm()">
+                        <i class="fas fa-plus me-2"></i>Add New Category
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="refreshCategoriesInMainForm()">
+                    <i class="fas fa-sync me-2"></i>Refresh & Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,669 @@
+<!-- Entry Modal Content -->
+<div class="modal-header bg-primary text-white">
+    <h5 class="modal-title">
+        <i class="fas fa-calendar-day me-2"></i>
+        {% if created %}
+            Add Entry for {{ entry_date|date:"l, F j, Y" }}
+        {% else %}
+            Edit Entry for {{ entry_date|date:"l, F j, Y" }}
+        {% endif %}
+    </h5>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+</div>
+
+<div class="modal-body">
+    <form id="entry-form" method="post">
+        {% csrf_token %}
+        
+        <!-- Date Field (Hidden) -->
+        <input type="hidden" name="entry_date" value="{{ entry_date|date:'Y-m-d' }}">
+        
+        <div class="row">
+            <!-- Left Column: Win Title & Content -->
+            <div class="col-md-8">
+                <!-- Win Title -->
+                <div class="mb-3">
+                    <label for="{{ form.title.id_for_label }}" class="form-label">
+                        <i class="fas fa-trophy text-warning me-2"></i>
+                        <strong>Today's Win Title</strong>
+                    </label>
+                    {{ form.title }}
+                    {% if form.title.help_text %}
+                        <div class="form-text">{{ form.title.help_text }}</div>
+                    {% endif %}
+                    {% if form.title.errors %}
+                        <div class="text-danger small">{{ form.title.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                
+                <!-- Win Details -->
+                <div class="mb-3">
+                    <label for="{{ form.content.id_for_label }}" class="form-label">
+                        <i class="fas fa-list text-info me-2"></i>
+                        <strong>Your Daily Wins</strong>
+                        <small class="text-muted">(List your achievements, big and small!)</small>
+                    </label>
+                    {{ form.content }}
+                    {% if form.content.help_text %}
+                        <div class="form-text">{{ form.content.help_text }}</div>
+                    {% endif %}
+                    {% if form.content.errors %}
+                        <div class="text-danger small">{{ form.content.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Right Column: Mood & Categories -->
+            <div class="col-md-4">
+                <!-- Mood Rating -->
+                <div class="mb-3">
+                    <label for="{{ form.mood_rating.id_for_label }}" class="form-label">
+                        <i class="fas fa-smile text-success me-2"></i>
+                        <strong>How was your mood?</strong>
+                    </label>
+                    {{ form.mood_rating }}
+                    {% if form.mood_rating.help_text %}
+                        <div class="form-text">{{ form.mood_rating.help_text }}</div>
+                    {% endif %}
+                    {% if form.mood_rating.errors %}
+                        <div class="text-danger small">{{ form.mood_rating.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                
+                <!-- Categories -->
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="form-label mb-0">
+                            <i class="fas fa-tags text-secondary me-2"></i>
+                            <strong>Categories</strong>
+                        </label>
+                        <button type="button" class="btn btn-outline-primary btn-sm" id="manageCategoriesBtn" style="white-space: nowrap;">
+                            <i class="fas fa-cog me-1"></i>Manage
+                        </button>
+                    </div>
+                    
+                    <!-- Custom categories rendering -->
+                    <div class="category-checkboxes-custom">
+                        {% for category in form.categories.field.queryset %}
+                        <div class="category-item">
+                            <input 
+                                type="checkbox" 
+                                id="id_categories_{{ category.id }}" 
+                                name="categories" 
+                                value="{{ category.id }}"
+                                {% if form.categories.value and category.id in form.categories.value %}checked{% endif %}
+                                class="category-checkbox">
+                            <label for="id_categories_{{ category.id }}" class="category-label">
+                                <span class="category-color-dot" style="background-color: {{ category.color }};"></span>
+                                {{ category.name }}
+                            </label>
+                        </div>
+                        {% empty %}
+                        <div class="no-categories-message">
+                            <i class="fas fa-info-circle text-muted me-2"></i>
+                            <span class="text-muted">No categories yet. Click "Manage" to create some!</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    {% if form.categories.help_text %}
+                        <div class="form-text">{{ form.categories.help_text }}</div>
+                    {% endif %}
+                    {% if form.categories.errors %}
+                        <div class="text-danger small">{{ form.categories.errors.0 }}</div>
+                    {% endif %}
+                    <div class="text-muted small mt-2">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Select one or more categories to organize your wins
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Gratitude Section -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="gratitude-section p-3 bg-light rounded">
+                    <label for="{{ form.gratitude_text.id_for_label }}" class="form-label">
+                        <i class="fas fa-heart text-danger me-2"></i>
+                        <strong>Today I was grateful for...</strong>
+                    </label>
+                    {{ form.gratitude_text }}
+                    {% if form.gratitude_text.help_text %}
+                        <div class="form-text">{{ form.gratitude_text.help_text }}</div>
+                    {% endif %}
+                    {% if form.gratitude_text.errors %}
+                        <div class="text-danger small">{{ form.gratitude_text.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Form Errors -->
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger mt-3">
+                {% for error in form.non_field_errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </form>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+        <i class="fas fa-times me-2"></i>Cancel
+    </button>
+    <button type="submit" form="entry-form" class="btn btn-primary">
+        <i class="fas fa-save me-2"></i>
+        {% if created %}Save Entry{% else %}Update Entry{% endif %}
+    </button>
+</div>
+
+<style>
+.gratitude-section {
+    border-left: 4px solid #ffc107;
+    background: linear-gradient(135deg, #fff8e7 0%, #ffffff 100%);
+}
+
+/* Custom Categories Styling */
+.category-checkboxes-custom {
+    max-height: 220px;
+    overflow-y: auto;
+    padding: 8px 0;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    background-color: #fafafa;
+}
+
+.category-item {
+    display: flex;
+    align-items: center;
+    padding: 14px 18px;
+    margin: 4px 8px;
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    min-height: 50px;
+    cursor: pointer;
+}
+
+.category-item:hover {
+    background-color: #f8f9fa;
+    border-color: #007bff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,123,255,0.15);
+}
+
+.category-checkbox {
+    margin-right: 12px;
+    transform: scale(1.3);
+    cursor: pointer;
+}
+
+.category-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin: 0;
+    font-weight: 500;
+    font-size: 0.95rem;
+    flex-grow: 1;
+}
+
+.category-color-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 10px;
+    border: 2px solid white;
+    box-shadow: 0 0 0 1px #dee2e6;
+}
+
+/* Category manager modal improvements */
+.quick-category-form .card {
+    background-color: #f8f9fa;
+    border: 1px dashed #6c757d;
+}
+
+.quick-category-form .card-title {
+    color: #495057;
+    margin-bottom: 1rem;
+}
+
+#categoryManagerModal .list-group-item {
+    border-left: none;
+    border-right: none;
+    padding: 1rem;
+}
+
+#categoryManagerModal .list-group-item:first-child {
+    border-top: none;
+}
+
+#categoryManagerModal .list-group-item:last-child {
+    border-bottom: none;
+}
+
+.btn-outline-info {
+    border-width: 2px;
+}
+
+.no-categories-message {
+    padding: 20px;
+    text-align: center;
+    background: white;
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    margin: 8px;
+}
+
+.modal-body {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+/* Style the form fields */
+.form-control, .form-select {
+    border-radius: 8px;
+    border: 1px solid #e0e6ed;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+/* Mood rating styling */
+#id_mood_rating option {
+    font-size: 1.1rem;
+}
+
+/* Quick category form styling */
+.quick-category-form {
+    background: #f8f9fa;
+    border: 1px dashed #dee2e6;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 8px;
+}
+
+.category-color-preview {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 8px;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px #dee2e6;
+}
+</style>
+
+<!-- Category Management Modal -->
+<div class="modal fade" id="categoryManagerModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-tags me-2"></i>Manage Categories
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Quick add category form -->
+                <div class="quick-category-form mb-3" id="quickCategoryForm" style="display: none;">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="fas fa-plus me-2"></i>Add New Category
+                            </h6>
+                            <div class="row g-2">
+                                <div class="col-8">
+                                    <input type="text" class="form-control" id="categoryName" placeholder="Enter category name">
+                                </div>
+                                <div class="col-4">
+                                    <input type="color" class="form-control form-control-color" id="categoryColor" value="#007bff" title="Choose color">
+                                </div>
+                            </div>
+                            <div class="mt-3 text-end">
+                                <button type="button" class="btn btn-secondary btn-sm me-2" onclick="toggleCategoryForm()">
+                                    <i class="fas fa-times me-1"></i>Cancel
+                                </button>
+                                <button type="button" class="btn btn-success btn-sm" onclick="createCategory()">
+                                    <i class="fas fa-check me-1"></i>Create
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Existing categories list -->
+                <div id="category-list">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+                
+                <div class="text-center mt-3">
+                    <button type="button" class="btn btn-outline-info" onclick="toggleCategoryForm()">
+                        <i class="fas fa-plus me-2"></i>Add New Category
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="refreshCategoriesInMainForm()">
+                    <i class="fas fa-sync me-2"></i>Refresh & Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+console.log('🚀 Entry modal JavaScript is loading...');
+alert('JavaScript is working! Check the console now.');
+
+// Make entire category item clickable
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🎯 DOMContentLoaded fired!');
+    
+    // Add click handlers for category items
+    document.querySelectorAll('.category-item').forEach(function(item) {
+        item.addEventListener('click', function(e) {
+            // Don't trigger if clicking directly on checkbox or label
+            if (e.target.type !== 'checkbox' && !e.target.matches('label')) {
+                const checkbox = this.querySelector('input[type="checkbox"]');
+                if (checkbox) {
+                    checkbox.checked = !checkbox.checked;
+                    // Trigger change event for form validation
+                    checkbox.dispatchEvent(new Event('change'));
+                }
+            }
+        });
+    });
+    
+    // Add event listener for manage categories button
+    const manageCategoriesBtn = document.getElementById('manageCategoriesBtn');
+    console.log('Looking for manage button...', manageCategoriesBtn);
+    if (manageCategoriesBtn) {
+        console.log('✅ Manage categories button found! Adding event listener...');
+        manageCategoriesBtn.addEventListener('click', function() {
+            console.log('🔥 Manage categories button clicked!');
+            openCategoryManager();
+        });
+    } else {
+        console.error('❌ Manage categories button not found!');
+    }
+});
+
+function openCategoryManager() {
+    console.log('=== Opening category manager ===');
+    console.log('1. Function called successfully');
+    
+    // Check if Bootstrap is loaded
+    if (typeof bootstrap === 'undefined') {
+        console.error('❌ Bootstrap is not loaded');
+        alert('Error: Bootstrap is not loaded. The modal cannot open.');
+        return;
+    }
+    console.log('✅ Bootstrap is loaded');
+    
+    // Check if the modal element exists
+    const modalElement = document.getElementById('categoryManagerModal');
+    if (!modalElement) {
+        console.error('❌ Modal element not found');
+        alert('Error: Category manager modal not found in the DOM.');
+        return;
+    }
+    console.log('✅ Modal element found');
+    
+    // Load categories first
+    try {
+        loadUserCategories();
+        console.log('✅ Categories loaded');
+    } catch (error) {
+        console.error('❌ Error loading categories:', error);
+        alert('Error loading categories: ' + error.message);
+        return;
+    }
+    
+    // Try to create and show the modal
+    try {
+        const categoryModal = new bootstrap.Modal(modalElement);
+        console.log('✅ Modal instance created');
+        
+        categoryModal.show();
+        console.log('✅ Modal show() called');
+        
+        // Listen for modal events
+        modalElement.addEventListener('shown.bs.modal', function () {
+            console.log('✅ Modal is now visible');
+        });
+        
+        modalElement.addEventListener('hidden.bs.modal', function () {
+            console.log('ℹ️ Modal was hidden');
+        });
+        
+    } catch (error) {
+        console.error('❌ Error creating/showing modal:', error);
+        alert('Error opening category manager: ' + error.message);
+    }
+}
+
+function toggleQuickCategoryForm() {
+    const form = document.getElementById('quickCategoryForm');
+    const isVisible = form.style.display !== 'none';
+    form.style.display = isVisible ? 'none' : 'block';
+    
+    if (!isVisible) {
+        document.getElementById('newCategoryName').focus();
+    }
+}
+
+function loadUserCategories() {
+    console.log('Loading user categories...');
+    
+    const categoriesList = document.getElementById('categoriesList');
+    const mainFormCategories = document.querySelectorAll('#id_categories input[type="checkbox"]');
+    
+    console.log('Found categories:', mainFormCategories.length);
+    
+    let html = '<div class="list-group list-group-flush">';
+    
+    if (mainFormCategories.length === 0) {
+        html += '<div class="text-muted text-center py-4"><i class="fas fa-info-circle me-2"></i>No categories yet. Create your first one!</div>';
+    } else {
+        mainFormCategories.forEach((checkbox, index) => {
+            const label = checkbox.nextElementSibling;
+            const categoryName = label ? label.textContent.trim() : 'Unnamed';
+            const isChecked = checkbox.checked;
+            
+            // Use different colors for each category
+            const colors = ['#007bff', '#28a745', '#ffc107', '#17a2b8', '#e83e8c', '#6f42c1', '#fd7e14'];
+            const categoryColor = colors[index % colors.length];
+            
+            html += `
+                <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+                    <div class="d-flex align-items-center">
+                        <span class="category-color-preview" style="background-color: ${categoryColor};"></span>
+                        <span class="ms-3 fw-medium">${categoryName}</span>
+                        ${isChecked ? '<i class="fas fa-check text-success ms-2" title="Currently selected"></i>' : ''}
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-outline-warning btn-sm me-1" onclick="editCategory('${checkbox.value}')" title="Edit category">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteCategory('${checkbox.value}')" title="Delete category">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+    
+    html += '</div>';
+    categoriesList.innerHTML = html;
+    console.log('Categories loaded successfully');
+}
+
+function addQuickCategory() {
+    const name = document.getElementById('newCategoryName').value.trim();
+    const color = document.getElementById('newCategoryColor').value;
+    
+    console.log('Adding category:', name, color);
+    
+    if (!name) {
+        alert('Please enter a category name');
+        return;
+    }
+    
+    // Send AJAX request to create category
+    fetch('/tracker/categories/ajax/create/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+            name: name,
+            color: color
+        })
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        return response.json();
+    })
+    .then(data => {
+        console.log('Response data:', data);
+        if (data.success) {
+            alert(`Category "${name}" created successfully!`);
+            
+            // Reset form
+            document.getElementById('newCategoryName').value = '';
+            document.getElementById('newCategoryColor').value = '#007bff';
+            toggleQuickCategoryForm();
+            
+            // Reload categories list
+            loadUserCategories();
+        } else {
+            alert('Error creating category: ' + (data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Category creation failed, but AJAX endpoint exists! Check console for details.');
+    });
+}
+
+function editCategory(categoryId) {
+    alert(`Edit category ${categoryId} - This would open an edit form`);
+}
+
+function deleteCategory(categoryId) {
+    if (confirm('Are you sure you want to delete this category?')) {
+        console.log('Deleting category:', categoryId);
+        
+        // Send AJAX request to delete category
+        fetch(`/tracker/categories/${categoryId}/ajax/delete/`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => {
+            console.log('Delete response status:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Delete response data:', data);
+            if (data.success) {
+                alert(data.message || 'Category deleted successfully!');
+                loadUserCategories();
+            } else {
+                alert('Error deleting category: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Delete failed, but endpoint exists! Check console.');
+        });
+    }
+}
+
+function refreshCategoriesInMainForm() {
+    console.log('Refreshing categories in main form...');
+    
+    // Refresh the categories in the main form by reloading the checkbox options
+    fetch('/tracker/categories/ajax/list/')
+    .then(response => {
+        console.log('Categories list response status:', response.status);
+        return response.json();
+    })
+    .then(data => {
+        console.log('Categories list data:', data);
+        if (data.success) {
+            const categoriesContainer = document.querySelector('.category-checkboxes-custom');
+            if (categoriesContainer) {
+                // Update the categories with our custom structure
+                let html = '';
+                if (data.categories.length === 0) {
+                    html = `
+                        <div class="no-categories-message">
+                            <i class="fas fa-info-circle text-muted me-2"></i>
+                            <span class="text-muted">No categories yet. Click "Manage" to create some!</span>
+                        </div>
+                    `;
+                } else {
+                    data.categories.forEach(category => {
+                        html += `
+                            <div class="category-item">
+                                <input 
+                                    type="checkbox" 
+                                    id="id_categories_${category.id}" 
+                                    name="categories" 
+                                    value="${category.id}"
+                                    class="category-checkbox">
+                                <label for="id_categories_${category.id}" class="category-label">
+                                    <span class="category-color-dot" style="background-color: ${category.color};"></span>
+                                    ${category.name}
+                                </label>
+                            </div>
+                        `;
+                    });
+                }
+                categoriesContainer.innerHTML = html;
+                
+                // Re-attach click handlers
+                categoriesContainer.querySelectorAll('.category-item').forEach(function(item) {
+                    item.addEventListener('click', function(e) {
+                        if (e.target.type !== 'checkbox' && !e.target.matches('label')) {
+                            const checkbox = this.querySelector('input[type="checkbox"]');
+                            if (checkbox) {
+                                checkbox.checked = !checkbox.checked;
+                                checkbox.dispatchEvent(new Event('change'));
+                            }
+                        }
+                    });
+                });
+                
+                alert('Categories refreshed successfully!');
+            }
+        } else {
+            alert('Error refreshing categories');
+        }
+    })
+    .catch(error => {
+        console.error('Error refreshing categories:', error);
+        alert('Refresh failed, but endpoint exists! Check console.');
+    });
+    
+    // Close the modal
+    const categoryModal = bootstrap.Modal.getInstance(document.getElementById('categoryManagerModal'));
+    if (categoryModal) {
+        categoryModal.hide();
+    }
+}
+</script>
