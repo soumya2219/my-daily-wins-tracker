@@ -4,40 +4,45 @@ from .models import Entry, Category
 
 
 class EntryForm(forms.ModelForm):
-    """Form for creating and editing wins and gratitude entries"""
+    """Form for creating and editing daily entries with wins, mood, and gratitude"""
     
     class Meta:
         model = Entry
-        fields = ['entry_type', 'title', 'content', 'mood_rating', 'categories']
+        fields = ['entry_date', 'title', 'content', 'mood_rating', 'gratitude_text', 'categories']
         widgets = {
+            'entry_date': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date'
+            }),
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Give your entry a title...',
+                'placeholder': 'Summary of today (e.g., "Productive day at work")',
                 'maxlength': 200
             }),
             'content': forms.Textarea(attrs={
                 'class': 'form-control',
-                'placeholder': 'Write about your win or what you\'re grateful for...',
-                'rows': 6
+                'placeholder': 'List your wins here:\n• Completed project milestone\n• Had a great conversation with a friend\n• Learned something new\n• Made healthy choices...',
+                'rows': 5
             }),
-            'entry_type': forms.Select(attrs={
+            'mood_rating': forms.Select(attrs={
                 'class': 'form-select'
             }),
-            'mood_rating': forms.NumberInput(attrs={
+            'gratitude_text': forms.Textarea(attrs={
                 'class': 'form-control',
-                'min': 1,
-                'max': 10,
-                'placeholder': 'Rate 1-10 (optional)'
+                'placeholder': 'Today I was grateful for...',
+                'rows': 3
             }),
             'categories': forms.CheckboxSelectMultiple(attrs={
                 'class': 'form-check-input'
             })
         }
         help_texts = {
-            'title': 'A brief, descriptive title for your entry',
-            'content': 'Share the details - what happened, how you feel, why you\'re grateful',
-            'mood_rating': 'How are you feeling right now? (1=Low, 10=Amazing)',
-            'categories': 'Optional: tag this entry with categories to organize it'
+            'entry_date': 'Which date is this entry for?',
+            'title': 'A short summary of your day (optional)',
+            'content': 'List all your wins and achievements for the day',
+            'mood_rating': 'How was your overall mood today?',
+            'gratitude_text': 'What are you grateful for today?',
+            'categories': 'Optional: organize this entry with categories'
         }
 
     def __init__(self, *args, **kwargs):
@@ -51,40 +56,41 @@ class EntryForm(forms.ModelForm):
         else:
             self.fields['categories'].queryset = Category.objects.none()
         
-        # Make categories field optional and improve display
+        # Make categories field optional
         self.fields['categories'].required = False
         
-        # Add dynamic classes based on entry type (can be enhanced with JS)
-        if self.instance and self.instance.pk:
-            if self.instance.entry_type == Entry.EntryType.WIN:
-                self.fields['title'].widget.attrs['placeholder'] = 'What did you accomplish today?'
-                self.fields['content'].widget.attrs['placeholder'] = 'Describe your win - what you did, how it felt, why it matters...'
-            else:
-                self.fields['title'].widget.attrs['placeholder'] = 'What are you grateful for?'
-                self.fields['content'].widget.attrs['placeholder'] = 'Express your gratitude - what happened, who helped, why it means something...'
+        # Set default date to today if creating new entry
+        if not self.instance.pk:
+            from datetime import date
+            self.fields['entry_date'].initial = date.today()
 
     def clean(self):
         cleaned_data = super().clean()
-        entry_type = cleaned_data.get('entry_type')
+        mood_rating = cleaned_data.get('mood_rating')
         title = cleaned_data.get('title')
         content = cleaned_data.get('content')
-        mood_rating = cleaned_data.get('mood_rating')
+        gratitude_text = cleaned_data.get('gratitude_text')
         
-        # Validate mood rating range (additional validation beyond model)
-        if mood_rating is not None and (mood_rating < 1 or mood_rating > 10):
-            raise ValidationError({
-                'mood_rating': 'Mood rating must be between 1 and 10.'
-            })
+        # Ensure at least some content is provided
+        if not any([title, content, gratitude_text, mood_rating]):
+            raise ValidationError(
+                'Please provide at least a title, content, gratitude note, or mood rating.'
+            )
         
-        # Ensure title and content are meaningful
+        # Validate meaningful content length
         if title and len(title.strip()) < 3:
             raise ValidationError({
                 'title': 'Title must be at least 3 characters long.'
             })
         
-        if content and len(content.strip()) < 10:
+        if content and len(content.strip()) < 5:
             raise ValidationError({
-                'content': 'Please write at least 10 characters to make your entry meaningful.'
+                'content': 'Content should be at least 5 characters long.'
+            })
+        
+        if gratitude_text and len(gratitude_text.strip()) < 5:
+            raise ValidationError({
+                'gratitude_text': 'Gratitude note should be at least 5 characters long.'
             })
         
         return cleaned_data
@@ -105,49 +111,40 @@ class EntryForm(forms.ModelForm):
 
 
 class QuickEntryForm(forms.ModelForm):
-    """Simplified form for quick entry creation from dashboard"""
+    """Simplified form for quick daily entry creation"""
     
     class Meta:
         model = Entry
-        fields = ['entry_type', 'title', 'content']
+        fields = ['title', 'content', 'mood_rating']
         widgets = {
-            'entry_type': forms.HiddenInput(),  # Will be set by the view
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Quick title...'
+                'placeholder': 'Quick win title...'
             }),
             'content': forms.Textarea(attrs={
                 'class': 'form-control',
-                'rows': 3,
-                'placeholder': 'What happened?'
+                'rows': 2,
+                'placeholder': 'What happened today?'
+            }),
+            'mood_rating': forms.Select(attrs={
+                'class': 'form-select'
             })
         }
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
-        self.entry_type = kwargs.pop('entry_type', None)
+        self.entry_date = kwargs.pop('entry_date', None)
         super().__init__(*args, **kwargs)
-        
-        # Pre-set entry type if provided
-        if self.entry_type:
-            self.fields['entry_type'].initial = self.entry_type
-            
-            # Customize placeholders based on entry type
-            if self.entry_type == Entry.EntryType.WIN:
-                self.fields['title'].widget.attrs['placeholder'] = 'What did you win at today?'
-                self.fields['content'].widget.attrs['placeholder'] = 'Quick note about your accomplishment...'
-            else:
-                self.fields['title'].widget.attrs['placeholder'] = 'What are you grateful for?'
-                self.fields['content'].widget.attrs['placeholder'] = 'Quick note about your gratitude...'
 
     def save(self, commit=True):
         entry = super().save(commit=False)
         
-        if self.user:
+        # Set the user and date
+        if self.user and not entry.user_id:
             entry.user = self.user
         
-        if self.entry_type:
-            entry.entry_type = self.entry_type
+        if self.entry_date:
+            entry.entry_date = self.entry_date
         
         if commit:
             entry.save()

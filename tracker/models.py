@@ -48,26 +48,44 @@ class Category(models.Model):
 
 
 class Entry(models.Model):
-    """Model for storing both wins and gratitude entries."""
+    """Model for daily entries with wins, mood, and gratitude tracking."""
     
-    class EntryType(models.TextChoices):
-        WIN = 'win', 'Daily Win'
-        GRATITUDE = 'gratitude', 'Gratitude Entry'
+    class MoodChoice(models.IntegerChoices):
+        TERRIBLE = 1, '😰 Terrible'
+        BAD = 2, '😞 Bad'
+        MEH = 3, '😐 Meh'
+        OKAY = 4, '🙂 Okay'
+        GOOD = 5, '😊 Good'
+        GREAT = 6, '😄 Great'
+        AMAZING = 7, '🤩 Amazing'
+        FANTASTIC = 8, '🥳 Fantastic'
+        INCREDIBLE = 9, '✨ Incredible'
+        PERFECT = 10, '🌟 Perfect'
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='entries')
-    entry_type = models.CharField(
-        max_length=10, 
-        choices=EntryType.choices,
-        db_index=True  # Add index for frequent filtering
-    )
-    title = models.CharField(max_length=200)
-    content = models.TextField()
+    
+    # Date field for daily entries (one entry per day per user)
+    entry_date = models.DateField(help_text="The date this entry is for", null=True, blank=True)
+    
+    # Core entry fields
+    title = models.CharField(max_length=200, blank=True, help_text="Short title for your daily win")
+    content = models.TextField(blank=True, help_text="Details about your daily wins")
+    
+    # Mood tracking
     mood_rating = models.IntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(10)],
+        choices=MoodChoice.choices,
         null=True,
         blank=True,
-        help_text="Rate your mood from 1-10 (optional)"
+        help_text="How was your mood today?"
     )
+    
+    # Gratitude section
+    gratitude_text = models.TextField(
+        blank=True,
+        help_text="Today I was grateful for..."
+    )
+    
+    # Timestamps
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
     is_private = models.BooleanField(default=True)
@@ -82,25 +100,40 @@ class Entry(models.Model):
     
     class Meta:
         verbose_name_plural = "Entries"
-        ordering = ['-date_created']
+        ordering = ['-entry_date', '-date_created']
         constraints = [
+            # Ensure one entry per user per day
+            UniqueConstraint(
+                fields=['user', 'entry_date'],
+                name='unique_entry_per_user_per_day',
+                violation_error_message='You can only have one entry per day.'
+            ),
             models.CheckConstraint(
-                name='mood_rating_null_or_between_1_10',
-                check=(
-                    models.Q(mood_rating__isnull=True) |
-                    (models.Q(mood_rating__gte=1) & models.Q(mood_rating__lte=10))
-                ),
-                violation_error_message='Mood rating must be between 1 and 10 (or left blank).',
+                name='mood_rating_valid_choice',
+                check=models.Q(mood_rating__isnull=True) | models.Q(mood_rating__in=[1,2,3,4,5,6,7,8,9,10]),
+                violation_error_message='Mood rating must be between 1 and 10.',
             )
         ]
         indexes = [
-            models.Index(fields=['user', '-date_created']),
+            models.Index(fields=['user', '-entry_date']),
+            models.Index(fields=['user', 'entry_date']),  # For specific day lookups
             models.Index(fields=['mood_rating']),
-            # Removed separate entry_type index since db_index=True creates one
         ]
     
     def __str__(self):
-        return f"{self.get_entry_type_display()}: {self.title[:50]}"
+        return f"{self.user.username} - {self.entry_date}: {self.title[:30] if self.title else 'No title'}"
+    
+    @property
+    def mood_emoji(self):
+        """Return the emoji for the current mood rating."""
+        if self.mood_rating:
+            return dict(self.MoodChoice.choices)[self.mood_rating]
+        return "😶 No mood set"
+    
+    @property
+    def has_content(self):
+        """Check if entry has any content."""
+        return bool(self.title or self.content or self.gratitude_text or self.mood_rating)
 
 
 # Signal to prevent cross-user category assignments

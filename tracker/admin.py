@@ -12,18 +12,18 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Entry)
 class EntryAdmin(admin.ModelAdmin):
-    list_display = ['title', 'entry_type', 'user', 'mood_rating', 'date_created']
-    list_filter = ['entry_type', 'mood_rating', 'date_created', 'user']
-    search_fields = ['title', 'content', 'user__username']
+    list_display = ['title', 'entry_date', 'user', 'mood_rating', 'date_created']
+    list_filter = ['entry_date', 'mood_rating', 'date_created', 'user']
+    search_fields = ['title', 'content', 'gratitude_text', 'user__username']
     readonly_fields = ['date_created', 'date_modified']
     filter_horizontal = ('categories',)  # Nice widget for many-to-many
     
     fieldsets = (
         ('Entry Details', {
-            'fields': ('user', 'entry_type', 'title', 'content')
+            'fields': ('user', 'entry_date', 'title', 'content')
         }),
-        ('Mood & Categories', {
-            'fields': ('mood_rating', 'categories')
+        ('Mood & Gratitude', {
+            'fields': ('mood_rating', 'gratitude_text', 'categories')
         }),
         ('Settings', {
             'fields': ('is_private',),
