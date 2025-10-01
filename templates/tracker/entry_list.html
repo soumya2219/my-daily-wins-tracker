@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block title %}All Entries - Daily Wins Tracker{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1>📚 Your Entries</h1>
+                <p class="text-muted">
+                    {% if total_count %}
+                        {{ total_count }} entr{{ total_count|pluralize:"y,ies" }} found
+                    {% else %}
+                        No entries yet
+                    {% endif %}
+                </p>
+            </div>
+            <div>
+                <a href="{% url 'entry_create' %}" class="btn btn-primary">
+                    ✨ New Entry
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filter and Search Row -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <!-- Search -->
+                    <div class="col-md-4">
+                        <label for="search" class="form-label">Search</label>
+                        <input type="text" class="form-control" id="search" name="search" 
+                               value="{{ search_query }}" placeholder="Search titles and content...">
+                    </div>
+                    
+                    <!-- Entry Type Filter -->
+                    <div class="col-md-3">
+                        <label for="type" class="form-label">Type</label>
+                        <select class="form-select" id="type" name="type">
+                            <option value="">All Types</option>
+                            <option value="win" {% if current_filter == 'win' %}selected{% endif %}>🏆 Wins</option>
+                            <option value="gratitude" {% if current_filter == 'gratitude' %}selected{% endif %}>🙏 Gratitude</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Category Filter -->
+                    <div class="col-md-3">
+                        <label for="category" class="form-label">Category</label>
+                        <select class="form-select" id="category" name="category">
+                            <option value="">All Categories</option>
+                            {% for category in user_categories %}
+                                <option value="{{ category.pk }}" {% if current_category == category.pk|stringformat:"s" %}selected{% endif %}>
+                                    {{ category.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Filter Button -->
+                    <div class="col-md-2">
+                        <label class="form-label">&nbsp;</label>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-outline-primary">
+                                🔍 Filter
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                
+                {% if search_query or current_filter or current_category %}
+                    <div class="mt-3">
+                        <a href="{% url 'entry_list' %}" class="btn btn-sm btn-outline-secondary">
+                            Clear Filters
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Entries List -->
+<div class="row">
+    <div class="col-md-12">
+        {% if entries %}
+            {% for entry in entries %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="d-flex align-items-start">
+                                    <div class="me-3">
+                                        {% if entry.entry_type == 'win' %}
+                                            <span class="badge bg-success fs-6">🏆 Win</span>
+                                        {% else %}
+                                            <span class="badge bg-info fs-6">🙏 Gratitude</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h5 class="card-title mb-2">
+                                            <a href="{% url 'entry_detail' entry.pk %}" class="text-decoration-none">
+                                                {{ entry.title }}
+                                            </a>
+                                        </h5>
+                                        <p class="card-text text-muted">
+                                            {{ entry.content|truncatewords:30 }}
+                                        </p>
+                                        
+                                        <!-- Categories -->
+                                        {% if entry.categories.all %}
+                                            <div class="mb-2">
+                                                {% for category in entry.categories.all %}
+                                                    <span class="badge me-1" style="background-color: {{ category.color }};">
+                                                        {{ category.name }}
+                                                    </span>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                        
+                                        <!-- Meta information -->
+                                        <small class="text-muted">
+                                            {{ entry.date_created|timesince }} ago
+                                            {% if entry.mood_rating %}
+                                                • Mood: {{ entry.mood_rating }}/10
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="btn-group-vertical btn-group-sm" role="group">
+                                    <a href="{% url 'entry_detail' entry.pk %}" class="btn btn-outline-primary">
+                                        👁️ View
+                                    </a>
+                                    <a href="{% url 'entry_edit' entry.pk %}" class="btn btn-outline-secondary">
+                                        ✏️ Edit
+                                    </a>
+                                    <a href="{% url 'entry_delete' entry.pk %}" class="btn btn-outline-danger">
+                                        🗑️ Delete
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+                <nav aria-label="Entry pagination">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if current_filter %}type={{ current_filter }}&{% endif %}{% if current_category %}category={{ current_category }}&{% endif %}page={{ page_obj.previous_page_number }}">
+                                    Previous
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if current_filter %}type={{ current_filter }}&{% endif %}{% if current_category %}category={{ current_category }}&{% endif %}page={{ num }}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if current_filter %}type={{ current_filter }}&{% endif %}{% if current_category %}category={{ current_category }}&{% endif %}page={{ page_obj.next_page_number }}">
+                                    Next
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+            
+        {% else %}
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    {% if search_query or current_filter or current_category %}
+                        <h4 class="text-muted">🔍 No entries found</h4>
+                        <p class="text-muted">Try adjusting your search criteria or filters.</p>
+                        <a href="{% url 'entry_list' %}" class="btn btn-outline-secondary">Clear Filters</a>
+                    {% else %}
+                        <h4 class="text-muted">📝 No entries yet!</h4>
+                        <p class="text-muted">Start your journey by creating your first entry.</p>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                            <a href="{% url 'entry_create' %}?type=win" class="btn btn-success">
+                                🏆 Add a Win
+                            </a>
+                            <a href="{% url 'entry_create' %}?type=gratitude" class="btn btn-info">
+                                🙏 Add Gratitude
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

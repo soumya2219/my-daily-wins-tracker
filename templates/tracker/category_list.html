@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Categories - Daily Wins Tracker{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1>🏷️ Your Categories</h1>
+                <p class="text-muted">Organize your entries with custom categories</p>
+            </div>
+            <div>
+                <a href="{% url 'category_create' %}" class="btn btn-primary">
+                    ✨ New Category
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        {% if categories %}
+            <div class="row">
+                {% for category in categories %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <span class="badge me-2" style="background-color: {{ category.color }}; width: 20px; height: 20px;">&nbsp;</span>
+                                    <h5 class="mb-0">{{ category.name }}</h5>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" 
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                        ⚙️
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'category_edit' category.pk %}">
+                                                ✏️ Edit
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item text-danger" href="{% url 'category_delete' category.pk %}">
+                                                🗑️ Delete
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                {% if category.description %}
+                                    <p class="card-text text-muted">{{ category.description }}</p>
+                                {% else %}
+                                    <p class="card-text text-muted fst-italic">No description</p>
+                                {% endif %}
+                                
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        {{ category.entry_count }} entr{{ category.entry_count|pluralize:"y,ies" }}
+                                    </small>
+                                    <small class="text-muted">
+                                        Created {{ category.date_created|timesince }} ago
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <div class="btn-group w-100" role="group">
+                                    <a href="{% url 'entry_list' %}?category={{ category.pk }}" 
+                                       class="btn btn-outline-primary btn-sm">
+                                        👁️ View Entries
+                                    </a>
+                                    <a href="{% url 'category_edit' category.pk %}" 
+                                       class="btn btn-outline-secondary btn-sm">
+                                        ✏️ Edit
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <h4 class="text-muted">🏷️ No categories yet!</h4>
+                    <p class="text-muted">Categories help you organize and filter your entries.</p>
+                    <p class="text-muted mb-4">
+                        Create categories like "Work", "Health", "Personal", "Goals", etc.
+                    </p>
+                    <a href="{% url 'category_create' %}" class="btn btn-primary">
+                        ✨ Create Your First Category
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h6 class="card-title">💡 Quick Actions</h6>
+                <div class="d-grid gap-2 d-md-flex">
+                    <a href="{% url 'entry_create' %}" class="btn btn-outline-primary btn-sm">
+                        📝 Add New Entry
+                    </a>
+                    <a href="{% url 'entry_list' %}" class="btn btn-outline-secondary btn-sm">
+                        📚 View All Entries
+                    </a>
+                    <a href="{% url 'dashboard' %}" class="btn btn-outline-info btn-sm">
+                        📊 Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

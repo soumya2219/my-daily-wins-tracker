@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}
+    {% if is_editing %}Edit Category{% else %}New Category{% endif %} - Daily Wins Tracker
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        {% if is_editing %}
+                            <h3>✏️ Edit Category</h3>
+                            <p class="mb-0 text-muted">Update "{{ category.name }}"</p>
+                        {% else %}
+                            <h3>🏷️ New Category</h3>
+                            <p class="mb-0 text-muted">Create a new category to organize your entries</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <a href="{% url 'category_list' %}" class="btn btn-outline-secondary">
+                            ← Back
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <strong>Please fix the following errors:</strong>
+                        <ul class="mb-0 mt-2">
+                            {% for field, errors in form.errors.items %}
+                                {% for error in errors %}
+                                    <li>{% if field != '__all__' %}{{ field|title }}: {% endif %}{{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    <!-- Name -->
+                    <div class="mb-4">
+                        <label for="{{ form.name.id_for_label }}" class="form-label fw-bold">
+                            Category Name *
+                        </label>
+                        {{ form.name }}
+                        {% if form.name.help_text %}
+                            <div class="form-text">{{ form.name.help_text }}</div>
+                        {% endif %}
+                        {% if form.name.errors %}
+                            <div class="text-danger small">{{ form.name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Color -->
+                    <div class="mb-4">
+                        <label for="{{ form.color.id_for_label }}" class="form-label fw-bold">
+                            Color
+                        </label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.color }}
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center h-100">
+                                    <span id="color-preview" class="badge fs-6 me-2">Preview</span>
+                                    <small class="text-muted">This color will be used for tags</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% if form.color.help_text %}
+                            <div class="form-text">{{ form.color.help_text }}</div>
+                        {% endif %}
+                        {% if form.color.errors %}
+                            <div class="text-danger small">{{ form.color.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-4">
+                        <label for="{{ form.description.id_for_label }}" class="form-label fw-bold">
+                            Description (Optional)
+                        </label>
+                        {{ form.description }}
+                        {% if form.description.help_text %}
+                            <div class="form-text">{{ form.description.help_text }}</div>
+                        {% endif %}
+                        {% if form.description.errors %}
+                            <div class="text-danger small">{{ form.description.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'category_list' %}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            {% if is_editing %}
+                                ✅ Update Category
+                            {% else %}
+                                🏷️ Create Category
+                            {% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        {% if not is_editing %}
+            <!-- Suggestions for new users -->
+            <div class="card mt-4 bg-light">
+                <div class="card-body">
+                    <h6 class="card-title">💡 Category Ideas</h6>
+                    <p class="card-text small text-muted">
+                        Popular categories: Work, Health, Personal Growth, Relationships, 
+                        Hobbies, Goals, Family, Learning, Achievements, Self Care
+                    </p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// Update color preview when color changes
+document.addEventListener('DOMContentLoaded', function() {
+    const colorInput = document.getElementById('{{ form.color.id_for_label }}');
+    const colorPreview = document.getElementById('color-preview');
+    
+    function updateColorPreview() {
+        const color = colorInput.value;
+        colorPreview.style.backgroundColor = color;
+        
+        // Adjust text color for better contrast
+        const rgb = hexToRgb(color);
+        if (rgb) {
+            const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
+            colorPreview.style.color = brightness > 128 ? '#000000' : '#ffffff';
+        }
+    }
+    
+    function hexToRgb(hex) {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : null;
+    }
+    
+    colorInput.addEventListener('input', updateColorPreview);
+    updateColorPreview(); // Set initial color
+});
+</script>
+{% endblock %}
