@@ -11,9 +11,12 @@
                 <p class="text-muted">Your personal safe space for wins and gratitude</p>
             </div>
             <div>
-                <a href="{% url 'logout' %}" class="btn btn-outline-secondary">
-                    🚪 Logout
-                </a>
+                <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-secondary">
+                        🚪 Logout
+                    </button>
+                </form>
             </div>
         </div>
     </div>

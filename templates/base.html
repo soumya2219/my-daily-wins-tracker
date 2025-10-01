@@ -151,7 +151,14 @@
                                 <li><a class="dropdown-item" href="{% url 'entry_list' %}">📝 All Entries</a></li>
                                 <li><a class="dropdown-item" href="{% url 'category_list' %}">🏷️ Categories</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{% url 'logout' %}">🚪 Logout</a></li>
+                                <li>
+                                    <form method="post" action="{% url 'logout' %}" style="margin: 0; padding: 0;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item" style="background: none; border: none; width: 100%; text-align: left;">
+                                            🚪 Logout
+                                        </button>
+                                    </form>
+                                </li>
                             </ul>
                         </li>
                     {% else %}
