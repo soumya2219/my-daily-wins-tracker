@@ -253,7 +253,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function loadEntryModal(date) {
     const modalElement = new bootstrap.Modal(document.getElementById('entryModal'));
     
-    // Show loading state
+    // show loading spinner
     document.getElementById('modal-content').innerHTML = `
         <div class="modal-body text-center p-5">
             <div class="spinner-border text-primary" role="status">
@@ -264,17 +264,18 @@ function loadEntryModal(date) {
     `;
     modalElement.show();
     
-    // Load entry data
+    // get entry data from server
     fetch('/entry/' + date + '/')
         .then(response => response.json())
         .then(data => {
             document.getElementById('modal-content').innerHTML = data.html;
             
-            // Initialize form handling
+            // setup form handling
             initializeModalForm(date);
         })
         .catch(error => {
             console.error('Error loading entry:', error);
+            // TODO: better error handling
             document.getElementById('modal-content').innerHTML = `
                 <div class="modal-body text-center p-5">
                     <div class="text-danger">
@@ -441,6 +442,7 @@ function displayCategories(categories) {
     console.log('✅ Categories displayed successfully');
 }
 
+// Category deletion with confirmation
 function deleteCategory(categoryId) {
     if (!confirm('Are you sure you want to delete this category?')) {
         return;
@@ -468,11 +470,13 @@ function deleteCategory(categoryId) {
     });
 }
 
+// Create new category via AJAX
 function createCategory() {
-    console.log('🎯 createCategory() called!');
+    console.log('🎨 Creating new category...');
     const nameInput = document.getElementById('categoryName');
     const colorInput = document.getElementById('categoryColor');
     
+    // Validate form inputs exist
     if (!nameInput || !colorInput) {
         console.error('❌ Category form inputs not found');
         alert('Category form inputs not found');
@@ -490,6 +494,7 @@ function createCategory() {
         return;
     }
     
+    // Prepare form data for submission
     const formData = new FormData();
     formData.append('name', name);
     formData.append('color', color);
@@ -498,6 +503,7 @@ function createCategory() {
     
     console.log('🚀 Sending create request...');
     
+    // Submit to server
     fetch('/categories/ajax/create/', {
         method: 'POST',
         body: formData
@@ -509,6 +515,7 @@ function createCategory() {
     .then(data => {
         console.log('📦 Response data:', data);
         if (data.success) {
+            // Clear form and reload categories
             nameInput.value = '';
             colorInput.value = '#007bff';
             loadUserCategories();
@@ -614,6 +621,7 @@ function refreshCategoriesInMainForm() {
     }
 }
 
+// Edit category functionality
 function editCategory(categoryId) {
     console.log('✏️ Editing category:', categoryId);
     

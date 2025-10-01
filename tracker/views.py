@@ -13,7 +13,7 @@ from .forms import EntryForm, QuickEntryForm, CategoryForm
 
 
 def home(request):
-    """Public home page - shows welcome or redirects logged-in users to dashboard"""
+    # Just redirect to dashboard if logged in, otherwise show home page
     if request.user.is_authenticated:
         return redirect('weekly_dashboard')
     return render(request, "home.html")
@@ -21,7 +21,6 @@ def home(request):
 
 @login_required
 def weekly_dashboard(request):
-    """Weekly card-based dashboard - shows 7 cards for the current week"""
     # Get current week (Monday to Sunday)
     today = date.today()
     days_since_monday = today.weekday()  # Monday = 0, Sunday = 6
@@ -97,13 +96,14 @@ def weekly_dashboard(request):
 
 @login_required
 def dashboard(request):
-    """Redirect old dashboard to new weekly dashboard"""
+    # redirect to weekly view
     return redirect('weekly_dashboard')
 
 
 @login_required
 def entry_detail_modal(request, entry_date):
-    """Get or create entry for a specific date - for modal popup"""
+    # Get or create entry for specific date 
+    # TODO: add better error handling here
     try:
         target_date = datetime.strptime(entry_date, '%Y-%m-%d').date()
     except ValueError:
@@ -258,14 +258,12 @@ def entry_list(request):
 
 @login_required
 def entry_detail(request, pk):
-    """View a single entry in detail"""
     entry = get_object_or_404(Entry, pk=pk, user=request.user)
     return render(request, 'tracker/entry_detail.html', {'entry': entry})
 
 
 @login_required
 def entry_create(request):
-    """Create a new entry (either win or gratitude)"""
     # Get entry type from URL parameter for UI display purposes
     entry_type = request.GET.get('type', 'win')  # Default to win for display
     
@@ -292,7 +290,6 @@ def entry_create(request):
 
 @login_required
 def entry_edit(request, pk):
-    """Edit an existing entry"""
     entry = get_object_or_404(Entry, pk=pk, user=request.user)
     
     if request.method == 'POST':
@@ -339,7 +336,7 @@ def quick_add_win(request):
             entry = form.save()
             messages.success(request, f'🏆 Win "{entry.title}" added!')
             
-            # Return JSON for AJAX requests
+            # check if its ajax
             if request.headers.get('Accept') == 'application/json':
                 return JsonResponse({
                     'success': True,
@@ -349,7 +346,7 @@ def quick_add_win(request):
             
             return redirect('dashboard')
     
-    # For GET requests or form errors, redirect to dashboard
+    # redirect to dashboard if form not valid or GET request
     if not form.is_valid():
         for error in form.errors.values():
             messages.error(request, f'Error: {error[0]}')
