@@ -4,7 +4,11 @@ from . import views
 urlpatterns = [
     # Home and dashboard
     path("", views.home, name="home"),
-    path("dashboard/", views.dashboard, name="dashboard"),
+    path("dashboard/", views.dashboard, name="dashboard"),  # Redirects to weekly
+    path("weekly/", views.weekly_dashboard, name="weekly_dashboard"),
+    
+    # AJAX endpoints for weekly cards
+    path("entry/<str:entry_date>/", views.entry_detail_modal, name="entry_detail_modal"),
     
     # Authentication
     path("register/", views.register_view, name="register"),
@@ -25,4 +29,9 @@ urlpatterns = [
     path("categories/new/", views.category_create, name="category_create"),
     path("categories/<int:pk>/edit/", views.category_edit, name="category_edit"),
     path("categories/<int:pk>/delete/", views.category_delete, name="category_delete"),
+    
+    # AJAX endpoints for category management
+    path("categories/ajax/create/", views.category_ajax_create, name="category_ajax_create"),
+    path("categories/ajax/list/", views.category_ajax_list, name="category_ajax_list"),
+    path("categories/<int:pk>/ajax/delete/", views.category_ajax_delete, name="category_ajax_delete"),
 ]
