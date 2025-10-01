@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome - Daily Wins Tracker{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8 text-center">
+        <div class="card border-0 bg-transparent">
+            <div class="card-body py-5">
+                <h1 class="display-4 mb-4">🌟 Welcome to Your Daily Wins Tracker</h1>
+                <p class="lead mb-4">
+                    Your personal, private space to celebrate daily wins and express gratitude. 
+                    Built with ADHD-friendly design to help you stay motivated and positive.
+                </p>
+                
+                <div class="row mb-5">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h3>🏆 Track Your Wins</h3>
+                                <p>Celebrate every achievement, no matter how small. Building momentum one win at a time.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h3>🙏 Express Gratitude</h3>
+                                <p>Cultivate positivity by recording what you're thankful for each day.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card border-success">
+                            <div class="card-body text-center">
+                                <h5>🔒 Private & Safe</h5>
+                                <p class="small text-muted">Your entries are completely private to you</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-info">
+                            <div class="card-body text-center">
+                                <h5>🧠 ADHD-Friendly</h5>
+                                <p class="small text-muted">Simple, clear design that works with your brain</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-warning">
+                            <div class="card-body text-center">
+                                <h5>📱 Easy to Use</h5>
+                                <p class="small text-muted">Quick entry creation and intuitive navigation</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                    <a href="{% url 'register' %}" class="btn btn-success btn-lg px-4">
+                        ✨ Get Started Free
+                    </a>
+                    <a href="{% url 'login' %}" class="btn btn-outline-primary btn-lg px-4">
+                        🔐 I Have an Account
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

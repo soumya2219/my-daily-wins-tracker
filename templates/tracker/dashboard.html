@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Daily Wins Tracker{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1>🌟 Welcome back, {{ user.username }}!</h1>
+                <p class="text-muted">Your personal safe space for wins and gratitude</p>
+            </div>
+            <div>
+                <a href="{% url 'logout' %}" class="btn btn-outline-secondary">
+                    🚪 Logout
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Row -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h2 class="text-primary">{{ total_entries }}</h2>
+                <p class="card-text">Total Entries</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h2 class="text-success">{{ total_wins }}</h2>
+                <p class="card-text">🏆 Wins</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h2 class="text-info">{{ total_gratitude }}</h2>
+                <p class="card-text">🙏 Gratitude</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                {% if recent_mood_avg %}
+                    <h2 class="text-warning">{{ recent_mood_avg }}/10</h2>
+                    <p class="card-text">😊 Recent Mood</p>
+                {% else %}
+                    <h2 class="text-muted">-</h2>
+                    <p class="card-text">😊 No Mood Data</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>✨ Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <a href="#" class="btn btn-success btn-lg w-100 mb-2">
+                            🏆 Add a Win
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="#" class="btn btn-info btn-lg w-100 mb-2">
+                            🙏 Add Gratitude
+                        </a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <a href="#" class="btn btn-outline-primary w-100">
+                            📝 View All Entries
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="#" class="btn btn-outline-secondary w-100">
+                            🏷️ Manage Categories
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Entries -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>📚 Recent Entries</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_entries %}
+                    {% for entry in recent_entries %}
+                        <div class="border-bottom pb-3 mb-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">
+                                        {% if entry.entry_type == 'win' %}🏆{% else %}🙏{% endif %}
+                                        {{ entry.title }}
+                                    </h6>
+                                    <p class="text-muted mb-1">{{ entry.content|truncatewords:20 }}</p>
+                                    <small class="text-muted">
+                                        {{ entry.date_created|timesince }} ago
+                                        {% if entry.mood_rating %}
+                                            • Mood: {{ entry.mood_rating }}/10
+                                        {% endif %}
+                                    </small>
+                                </div>
+                                <span class="badge bg-{% if entry.entry_type == 'win' %}success{% else %}info{% endif %}">
+                                    {{ entry.get_entry_type_display }}
+                                </span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <div class="text-center">
+                        <a href="#" class="btn btn-primary">View All Entries →</a>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <h5 class="text-muted">No entries yet!</h5>
+                        <p class="text-muted">Start by adding your first win or gratitude entry.</p>
+                        <a href="#" class="btn btn-success">🏆 Add Your First Win</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
