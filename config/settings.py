@@ -76,6 +76,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "widget_tweaks",  # For better form styling
     "tracker",  # your app
 ]
 
@@ -165,6 +166,13 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Whitenoise static file storage
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+# -------------------------
+# Authentication
+# -------------------------
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/dashboard/'
+LOGOUT_REDIRECT_URL = '/'
 
 # -------------------------
 # Defaults
