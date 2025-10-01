@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}DEBUG - Weekly Dashboard{% endblock %}
+
+{% block content %}
+<div style="background: red; color: white; padding: 20px; text-align: center;">
+    <h1>🔥 DEBUG MODE - WEEKLY DASHBOARD TEMPLATE IS LOADING! 🔥</h1>
+    <p>If you see this red box, the weekly dashboard template is working correctly!</p>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; padding: 20px;">
+    {% for day in week_days %}
+    <div style="background: #f8f9fa; border: 2px solid #007bff; border-radius: 15px; padding: 20px; min-width: 250px; flex: 1;">
+        <h3 style="color: #007bff;">{{ day.day_name }}</h3>
+        <p>{{ day.date|date:'M j, Y' }}</p>
+        <div style="background: white; padding: 15px; border-radius: 10px; margin-top: 10px;">
+            {% if day.entry and day.entry.has_content %}
+                <strong>Has Entry!</strong>
+                <p>{{ day.entry.title|default:"No title" }}</p>
+            {% else %}
+                <em>No entry yet - click to add!</em>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+console.log("DEBUG: Weekly dashboard template loaded successfully!");
+console.log("Week days data:", {{ week_days|length }});
+</script>
+{% endblock %}
