@@ -20,5 +20,5 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("", include("tracker.urls")),  # Custom auth views first
-    path('accounts/', include('django.contrib.auth.urls')),  # Built-in auth URLs (fallback)
+    # path('accounts/', include('django.contrib.auth.urls')),  # Commented out to force custom views
 ]
