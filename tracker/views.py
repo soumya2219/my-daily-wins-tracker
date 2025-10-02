@@ -15,7 +15,7 @@ from .forms import EntryForm, QuickEntryForm, CategoryForm
 
 
 def home(request):
-    # Just redirect to dashboard if logged in, otherwise show home page
+    """Landing page - redirect to dashboard if logged in"""
     if request.user.is_authenticated:
         return redirect('weekly_dashboard')
     return render(request, "home.html")
@@ -23,7 +23,8 @@ def home(request):
 
 @login_required
 def weekly_dashboard(request):
-    # Get current week (Monday to Sunday)
+    """Main weekly dashboard view"""
+    # Current week calculation (Monday-Sunday)
     today = date.today()
     days_since_monday = today.weekday()  # Monday = 0, Sunday = 6
     week_start = today - timedelta(days=days_since_monday)
@@ -104,14 +105,18 @@ def dashboard(request):
 
 @login_required
 def entry_detail_modal(request, entry_date):
-    # Get or create entry for specific date 
-    # TODO: add better error handling here
+    """
+    The popup modal when you click on a day in the calendar.
+    Handles both showing existing entries and creating new ones.
+    Uses AJAX so the page doesn't reload.
+    """
+    # Make sure the date is valid
     try:
         target_date = datetime.strptime(entry_date, '%Y-%m-%d').date()
     except ValueError:
         return JsonResponse({'error': 'Invalid date format'}, status=400)
     
-    # Get existing entry or create new one
+    # Get the entry for this day, or make a blank one if it doesn't exist
     entry, created = Entry.objects.get_or_create(
         user=request.user,
         entry_date=target_date,
@@ -123,9 +128,11 @@ def entry_detail_modal(request, entry_date):
     )
     
     if request.method == 'POST':
+        # Someone submitted the form
         form = EntryForm(request.POST, instance=entry, user=request.user)
         if form.is_valid():
             entry = form.save()
+            # Send back success response
             return JsonResponse({
                 'success': True,
                 'entry': {
@@ -170,7 +177,11 @@ def entry_detail_modal(request, entry_date):
 
 
 def register_view(request):
-    """User registration"""
+    """
+    Sign up page with our custom form that's friendlier for ADHD folks.
+    Auto-logs people in after they register so they don't have to do it twice.
+    """
+    # If already logged in, just go to dashboard
     if request.user.is_authenticated:
         return redirect('weekly_dashboard')
         
@@ -181,7 +192,7 @@ def register_view(request):
             username = form.cleaned_data.get('username')
             messages.success(request, f'Account created for {username}! You can now log in.')
             
-            # Auto-login the user after registration
+            # Log them in automatically - one less step
             login(request, user)
             return redirect('dashboard')
     else:

@@ -5,9 +5,13 @@ import re
 
 class CustomPasswordValidator:
     """
-    Custom password validator requiring at least one number and one letter.
+    ADHD-friendly password validation.
+    Requirements: letters + numbers + 8 chars minimum.
+    Removed common password check - too restrictive.
     """
+    
     def validate(self, password, user=None):
+        """Validate password has letters and numbers"""
         if not re.search(r'[0-9]', password):
             raise ValidationError(
                 "Password must contain at least one number (0-9).",
@@ -20,12 +24,17 @@ class CustomPasswordValidator:
             )
 
     def get_help_text(self):
+        """What shows up on the form"""
         return "Your password must contain at least one letter and one number."
 
 
 def validate_username(username):
     """
-    Validate username contains only letters, numbers, and underscores.
+    Username rules - keeping it simple and clear.
+    
+    - Letters, numbers, underscores only
+    - 3-30 characters
+    - No weird special characters that might break things
     """
     if not re.match(r'^[a-zA-Z0-9_]+$', username):
         raise ValidationError(

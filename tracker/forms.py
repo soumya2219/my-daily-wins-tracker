@@ -4,15 +4,20 @@ from .models import Entry, Category
 
 
 class EntryForm(forms.ModelForm):
-    """Form for creating and editing daily entries with wins, mood, and gratitude"""
+    """
+    The main form for adding/editing daily entries.
+    Made to be as user-friendly as possible with good placeholders and styling.
+    """
     
     class Meta:
         model = Entry
         fields = ['entry_date', 'title', 'content', 'mood_rating', 'gratitude_text', 'categories']
+        
+        # Bootstrap classes and helpful placeholder text
         widgets = {
             'entry_date': forms.DateInput(attrs={
                 'class': 'form-control',
-                'type': 'date'
+                'type': 'date'  # Gets the nice date picker
             }),
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -46,32 +51,41 @@ class EntryForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        # Extract user from kwargs to filter categories
+        """
+        Setup the form - mainly for filtering categories to only show your own ones.
+        Also sets today's date automatically for new entries.
+        """
+        # Get the user from the view so we can filter categories
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         
-        # Filter categories to only show user's own categories
+        # Only show categories that belong to this user
         if self.user:
             self.fields['categories'].queryset = Category.objects.filter(user=self.user)
         else:
+            # No user = no categories (shouldn't happen normally)
             self.fields['categories'].queryset = Category.objects.none()
         
-        # Make categories field optional
+        # Categories are optional - don't want to force people to use them
         self.fields['categories'].required = False
         
-        # Set default date to today if creating new entry
-        if not self.instance.pk:
+        # Auto-fill today's date for new entries
+        if not self.instance.pk:  # New entry
             from datetime import date
             self.fields['entry_date'].initial = date.today()
 
     def clean(self):
+        """
+        Validation - make sure at least something is filled in.
+        Trying to be reasonable and not too strict here.
+        """
         cleaned_data = super().clean()
         mood_rating = cleaned_data.get('mood_rating')
         title = cleaned_data.get('title')
         content = cleaned_data.get('content')
         gratitude_text = cleaned_data.get('gratitude_text')
         
-        # Check if all fields are empty/None
+        # Check if everything is actually empty
         title_empty = not title or not title.strip()
         content_empty = not content or not content.strip()
         gratitude_empty = not gratitude_text or not gratitude_text.strip()

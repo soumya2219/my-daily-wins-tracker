@@ -119,18 +119,21 @@ TEMPLATES = [
 ]
 
 # -------------------------
-# Database
+# Database Configuration
 # -------------------------
+# Hybrid setup: PostgreSQL for production (Heroku), SQLite for development
 DATABASE_URL = os.environ.get("DATABASE_URL")
 if DATABASE_URL:
+    # Production: Use PostgreSQL via Heroku DATABASE_URL
     DATABASES = {
         "default": dj_database_url.parse(
             DATABASE_URL,
-            conn_max_age=600,
-            ssl_require=True,
+            conn_max_age=600,      # Connection pooling for performance
+            ssl_require=True,      # Required for Heroku Postgres
         )
     }
 else:
+    # Development: Use SQLite for easy local development
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
@@ -139,41 +142,52 @@ else:
     }
 
 # -------------------------
-# Password validation
+# -------------------------
+# Password Validation - ADHD-Friendly Configuration
 # -------------------------
 AUTH_PASSWORD_VALIDATORS = [
+    # Check password isn't too similar to user info (username, email, etc.)
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    
+    # Require minimum 8 characters
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", "OPTIONS": {"min_length": 8}},
-    # Removed CommonPasswordValidator - ADHD-friendly approach
+    
+    # NOTE: CommonPasswordValidator removed for ADHD accessibility
+    # Users can use familiar passwords without frustrating rejections
+    
+    # Prevent purely numeric passwords (123456789)
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+    
+    # Our custom validator: requires letters + numbers (simple but secure)
     {"NAME": "tracker.validators.CustomPasswordValidator"},
 ]
 
 # -------------------------
-# I18N / TZ
+# Internationalization
 # -------------------------
 LANGUAGE_CODE = "en-us"
-TIME_ZONE = "UTC"
+TIME_ZONE = "UTC"  # Store all times in UTC, convert in templates as needed
 USE_I18N = True
 USE_TZ = True
 
 # -------------------------
-# Static files
+# Static Files (CSS, JavaScript, Images)
 # -------------------------
 STATIC_URL = "static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
-# If you have a local /static folder for your own assets, uncomment:
+STATIC_ROOT = BASE_DIR / "staticfiles"  # Where collectstatic puts files for production
+
+# For local development static files (uncomment if you have a /static folder):
 # STATICFILES_DIRS = [BASE_DIR / "static"]
 
-# Whitenoise static file storage
+# Whitenoise for serving static files on Heroku with compression
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # -------------------------
-# Authentication
+# Authentication URLs and Redirects
 # -------------------------
-LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/dashboard/'
-LOGOUT_REDIRECT_URL = '/'
+LOGIN_URL = '/accounts/login/'           # Where to redirect if login required
+LOGIN_REDIRECT_URL = '/dashboard/'       # Where to go after successful login
+LOGOUT_REDIRECT_URL = '/'               # Where to go after logout
 
 # -------------------------
 # Defaults

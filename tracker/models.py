@@ -11,13 +11,19 @@ User = get_user_model()
 
 
 class Category(models.Model):
-    """Categories for organizing entries - user-specific."""
+    """
+    Categories for organizing entries - Work, Health, Personal etc.
+    User-specific so no cross-contamination between users.
+    """
     
+    # User ownership
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='categories')
     name = models.CharField(max_length=100)
+    
+    # Hex color for UI display
     color = models.CharField(
         max_length=7, 
-        default='#007bff',
+        default='#007bff',  # Bootstrap blue
         validators=[
             RegexValidator(
                 regex='^#[0-9A-Fa-f]{6}$',
@@ -25,7 +31,7 @@ class Category(models.Model):
             )
         ]
     )
-    description = models.TextField(blank=True)
+    description = models.TextField(blank=True)  # Optional notes
     date_created = models.DateTimeField(auto_now_add=True)
     
     class Meta:
@@ -48,9 +54,13 @@ class Category(models.Model):
 
 
 class Entry(models.Model):
-    """Model for daily entries with wins, mood, and gratitude tracking."""
+    """
+    Main daily entry model. One entry per day per user.
+    Tracks wins, mood, and gratitude.
+    """
     
     class MoodChoice(models.IntegerChoices):
+        """1-10 mood scale with emoji labels"""
         TERRIBLE = 1, '😰 Terrible'
         BAD = 2, '😞 Bad'
         MEH = 3, '😐 Meh'
@@ -62,12 +72,13 @@ class Entry(models.Model):
         INCREDIBLE = 9, '✨ Incredible'
         PERFECT = 10, '🌟 Perfect'
     
+    # User relationship
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='entries')
     
-    # Date field for daily entries (one entry per day per user)
+    # Date - enforces one entry per day
     entry_date = models.DateField(help_text="The date this entry is for", null=True, blank=True)
     
-    # Core entry fields
+    # Content fields - all optional to reduce friction
     title = models.CharField(max_length=200, blank=True, help_text="Short title for your daily win")
     content = models.TextField(blank=True, help_text="Details about your daily wins")
     
@@ -79,18 +90,20 @@ class Entry(models.Model):
         help_text="How was your mood today?"
     )
     
-    # Gratitude section
+    # Gratitude section - good for mental health
     gratitude_text = models.TextField(
         blank=True,
         help_text="Today I was grateful for..."
     )
     
-    # Timestamps
+    # Auto timestamps
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
+    
+    # All private for now
     is_private = models.BooleanField(default=True)
     
-    # Many-to-many relationship with categories
+    # Categories - many-to-many relationship
     categories = models.ManyToManyField(
         Category, 
         blank=True, 
@@ -100,9 +113,10 @@ class Entry(models.Model):
     
     class Meta:
         verbose_name_plural = "Entries"
+        # Show newest entries first
         ordering = ['-entry_date', '-date_created']
         constraints = [
-            # Ensure one entry per user per day
+            # Business rule: one entry per user per day to maintain daily habit
             UniqueConstraint(
                 fields=['user', 'entry_date'],
                 name='unique_entry_per_user_per_day',
@@ -114,34 +128,38 @@ class Entry(models.Model):
                 violation_error_message='Mood rating must be between 1 and 10.',
             )
         ]
+        # DB indexes for performance
         indexes = [
-            models.Index(fields=['user', '-entry_date']),
-            models.Index(fields=['user', 'entry_date']),  # For specific day lookups
-            models.Index(fields=['mood_rating']),
+            models.Index(fields=['user', '-entry_date']),  # Dashboard queries
+            models.Index(fields=['user', 'entry_date']),   # Day lookups
+            models.Index(fields=['mood_rating']),          # Filtering
         ]
     
     def __str__(self):
+        """Admin display"""
         return f"{self.user.username} - {self.entry_date}: {self.title[:30] if self.title else 'No title'}"
     
     @property
     def mood_emoji(self):
-        """Return the emoji for the current mood rating."""
+        """Get emoji for UI display"""
         if self.mood_rating:
             return dict(self.MoodChoice.choices)[self.mood_rating]
         return "😶 No mood set"
     
     @property
     def has_content(self):
-        """Check if entry has any content."""
+        """Check if entry has any content for calendar display"""
         return bool(self.title or self.content or self.gratitude_text or self.mood_rating)
 
 
-# Signal to prevent cross-user category assignments
+# Security: prevent users from assigning other users' categories
 @receiver(m2m_changed, sender=Entry.categories.through)
 def ensure_same_user_for_categories(sender, instance, action, reverse, model, pk_set, **kwargs):
-    """Ensure users can only assign their own categories to their entries."""
+    """
+    Data integrity check - make sure users can only assign their own categories.
+    """
     if action in {'pre_add', 'pre_set'} and pk_set:
-        # When adding categories to an Entry, ensure they belong to the same user
+        # Verify all categories belong to entry owner
         categories = Category.objects.filter(pk__in=pk_set).values_list('user_id', flat=True).distinct()
         if categories.count() > 1 or (categories and categories.first() != instance.user_id):
             raise ValidationError("You can only assign your own categories to your entries.")
