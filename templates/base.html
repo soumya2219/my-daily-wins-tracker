@@ -12,12 +12,23 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;700&display=swap" rel="stylesheet">
+    
     <!-- Custom CSS for ADHD-friendly design -->
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
         }
+        
+        /* Apply Comfortaa font to all headings */
+        h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+            font-family: 'Comfortaa', cursive;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
         .navbar-brand {
             font-weight: bold;
             font-size: 1.5rem;
@@ -56,16 +67,19 @@
         }
         
         .navbar-brand {
-            font-weight: bold;
+            font-family: 'Comfortaa', cursive;
+            font-weight: 700;
             font-size: 1.8rem;
             color: white !important;
             text-shadow: 0 2px 4px rgba(0,0,0,0.2);
             transition: all 0.3s ease;
+            letter-spacing: 0.5px;
         }
         
         .navbar-brand:hover {
             transform: translateY(-2px);
             color: #f8f9fa !important;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
         
         .navbar-nav .nav-link {
@@ -128,7 +142,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark custom-navbar">
         <div class="container">
             <a class="navbar-brand" href="{% url 'home' %}">
-                ✨ Daily Wins Tracker
+                ✨ My Daily Wins Tracker
             </a>
             
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -212,8 +226,8 @@
             background: linear-gradient(90deg, #ff6b6b, #ffa726, #66bb6a, #42a5f5, #ab47bc);
         "></div>
         <div class="container">
-            <p style="margin: 0; font-size: 1.1rem; font-weight: 500;">✨ Your personal safe space for wins and gratitude 🙏</p>
-            <p style="margin: 10px 0 0 0; opacity: 0.8; font-size: 0.9rem;">Made with ❤️ for ADHD-friendly journaling</p>
+            <p style="margin: 0; font-size: 1.1rem; font-weight: 500; font-family: 'Comfortaa', cursive;">✨ Your personal safe space for wins and gratitude 🙏</p>
+            <p style="margin: 10px 0 0 0; opacity: 0.8; font-size: 0.9rem; font-family: 'Comfortaa', cursive;">Made with ❤️ for ADHD-friendly journaling</p>
         </div>
     </footer>
 
