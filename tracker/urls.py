@@ -12,6 +12,8 @@ urlpatterns = [
     
     # Authentication
     path("register/", views.register_view, name="register"),
+    path("login/", views.custom_login_view, name="login"),
+    path("logout/", views.custom_logout_view, name="logout"),
     
     # Entry CRUD operations
     path("entries/", views.entry_list, name="entry_list"),

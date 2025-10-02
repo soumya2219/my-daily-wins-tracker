@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib import messages
 from django.db.models import Count, Q
 from django.core.paginator import Paginator
@@ -189,13 +189,35 @@ def register_view(request):
 
 
 def custom_login_view(request):
-    """Custom login view with better UX"""
+    """Custom login view with notifications"""
     if request.user.is_authenticated:
         return redirect('dashboard')
     
-    # Django's built-in LoginView will handle the actual login
-    # This is just for custom context if needed
-    return render(request, 'registration/login.html')
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, f'Welcome back, {username}! You are now logged in. 🎉')
+                return redirect('dashboard')
+        else:
+            messages.error(request, 'Invalid username or password. Please try again.')
+    else:
+        form = AuthenticationForm()
+    
+    return render(request, 'registration/login.html', {'form': form})
+
+
+def custom_logout_view(request):
+    """Custom logout view with notifications"""
+    if request.user.is_authenticated:
+        username = request.user.username
+        logout(request)
+        messages.success(request, f'Goodbye, {username}! You have been logged out successfully. 👋')
+    return redirect('home')
 
 
 # ================================
