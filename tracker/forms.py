@@ -71,26 +71,33 @@ class EntryForm(forms.ModelForm):
         content = cleaned_data.get('content')
         gratitude_text = cleaned_data.get('gratitude_text')
         
-        # Ensure at least some content is provided
-        if not any([title, content, gratitude_text, mood_rating]):
+        # Check if all fields are empty/None
+        title_empty = not title or not title.strip()
+        content_empty = not content or not content.strip()
+        gratitude_empty = not gratitude_text or not gratitude_text.strip()
+        mood_empty = not mood_rating
+        
+        # Ensure at least some meaningful content is provided
+        if title_empty and content_empty and gratitude_empty and mood_empty:
             raise ValidationError(
-                'Please provide at least a title, content, gratitude note, or mood rating.'
+                "🤔 Your entry seems to be empty! Please add at least one of the following: "
+                "a title, your wins/achievements, a gratitude note, or select your mood."
             )
         
-        # Validate meaningful content length
+        # Validate meaningful content length (only if something was entered)
         if title and len(title.strip()) < 3:
             raise ValidationError({
-                'title': 'Title must be at least 3 characters long.'
+                'title': 'Title should be at least 3 characters long.'
             })
         
         if content and len(content.strip()) < 5:
             raise ValidationError({
-                'content': 'Content should be at least 5 characters long.'
+                'content': 'Please write at least 5 characters about your wins.'
             })
         
         if gratitude_text and len(gratitude_text.strip()) < 5:
             raise ValidationError({
-                'gratitude_text': 'Gratitude note should be at least 5 characters long.'
+                'gratitude_text': 'Please write at least 5 characters about what you\'re grateful for.'
             })
         
         return cleaned_data

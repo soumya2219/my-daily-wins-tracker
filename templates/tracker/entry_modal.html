@@ -140,11 +140,24 @@
         </div>
         
         <!-- Form Errors -->
-        {% if form.non_field_errors %}
-            <div class="alert alert-danger mt-3">
-                {% for error in form.non_field_errors %}
-                    <div>{{ error }}</div>
-                {% endfor %}
+        {% if form.errors %}
+            <div class="alert alert-warning alert-dismissible fade show mt-3" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>Oops! Something needs your attention:</strong>
+                <ul class="mb-0 mt-2">
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                            <li>
+                                {% if field == '__all__' %}
+                                    {{ error }}
+                                {% else %}
+                                    <strong>{{ field|title }}:</strong> {{ error }}
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         {% endif %}
     </form>

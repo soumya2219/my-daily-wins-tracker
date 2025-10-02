@@ -35,39 +35,47 @@
             
             <div class="card-body">
                 {% if form.errors %}
-                    <div class="alert alert-danger">
-                        <strong>Please fix the following errors:</strong>
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Oops! Something needs your attention:</strong>
                         <ul class="mb-0 mt-2">
                             {% for field, errors in form.errors.items %}
                                 {% for error in errors %}
-                                    <li>{% if field != '__all__' %}{{ field|title }}: {% endif %}{{ error }}</li>
+                                    <li>
+                                        {% if field == '__all__' %}
+                                            {{ error }}
+                                        {% else %}
+                                            <strong>{{ field|title }}:</strong> {{ error }}
+                                        {% endif %}
+                                    </li>
                                 {% endfor %}
                             {% endfor %}
                         </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 {% endif %}
 
                 <form method="post" novalidate>
                     {% csrf_token %}
                     
-                    <!-- Entry Type -->
+                    <!-- Entry Date -->
                     <div class="mb-4">
-                        <label for="{{ form.entry_type.id_for_label }}" class="form-label fw-bold">
-                            Entry Type
+                        <label for="{{ form.entry_date.id_for_label }}" class="form-label fw-bold">
+                            Entry Date
                         </label>
-                        {{ form.entry_type|add_class:"form-select" }}
-                        {% if form.entry_type.help_text %}
-                            <div class="form-text">{{ form.entry_type.help_text }}</div>
+                        {{ form.entry_date }}
+                        {% if form.entry_date.help_text %}
+                            <div class="form-text">{{ form.entry_date.help_text }}</div>
                         {% endif %}
-                        {% if form.entry_type.errors %}
-                            <div class="text-danger small">{{ form.entry_type.errors.0 }}</div>
+                        {% if form.entry_date.errors %}
+                            <div class="text-danger small">{{ form.entry_date.errors.0 }}</div>
                         {% endif %}
                     </div>
 
                     <!-- Title -->
                     <div class="mb-4">
                         <label for="{{ form.title.id_for_label }}" class="form-label fw-bold">
-                            Title *
+                            Title <span class="text-muted">(optional)</span>
                         </label>
                         {{ form.title }}
                         {% if form.title.help_text %}
@@ -163,13 +171,9 @@
                         </a>
                         <button type="submit" class="btn btn-primary">
                             {% if is_editing %}
-                                ✅ Update Entry
+                                <i class="fas fa-save me-2"></i>Update Entry
                             {% else %}
-                                {% if entry_type == 'win' %}
-                                    🏆 Save My Win
-                                {% else %}
-                                    🙏 Save My Gratitude
-                                {% endif %}
+                                <i class="fas fa-save me-2"></i>Save Entry
                             {% endif %}
                         </button>
                     </div>
@@ -180,24 +184,63 @@
 </div>
 
 <script>
-// Dynamic placeholder updates based on entry type
 document.addEventListener('DOMContentLoaded', function() {
-    const entryTypeSelect = document.getElementById('{{ form.entry_type.id_for_label }}');
-    const titleInput = document.getElementById('{{ form.title.id_for_label }}');
-    const contentInput = document.getElementById('{{ form.content.id_for_label }}');
+    console.log('Form validation script loaded');
     
-    function updatePlaceholders() {
-        if (entryTypeSelect.value === 'win') {
-            titleInput.placeholder = 'What did you accomplish today?';
-            contentInput.placeholder = 'Describe your win - what you did, how it felt, why it matters...';
-        } else {
-            titleInput.placeholder = 'What are you grateful for?';
-            contentInput.placeholder = 'Express your gratitude - what happened, who helped, why it means something...';
-        }
+    // Form validation feedback
+    const form = document.querySelector('form');
+    const submitButton = document.querySelector('button[type="submit"]');
+    
+    console.log('Form found:', form);
+    console.log('Submit button found:', submitButton);
+    
+    if (form && submitButton) {
+        form.addEventListener('submit', function(e) {
+            console.log('Form submit triggered');
+            
+            // Get form values - use safer approach
+            const titleField = document.querySelector('input[name="title"]');
+            const contentField = document.querySelector('textarea[name="content"]');
+            const gratitudeField = document.querySelector('textarea[name="gratitude_text"]');
+            const moodField = document.querySelector('select[name="mood_rating"]');
+            
+            console.log('Title field:', titleField);
+            console.log('Content field:', contentField);
+            console.log('Gratitude field:', gratitudeField);
+            console.log('Mood field:', moodField);
+            
+            const title = titleField ? titleField.value.trim() : '';
+            const content = contentField ? contentField.value.trim() : '';
+            const gratitude = gratitudeField ? gratitudeField.value.trim() : '';
+            const mood = moodField ? moodField.value : '';
+            
+            console.log('Form values:', { title, content, gratitude, mood });
+            
+            // Check if form is completely empty
+            if (!title && !content && !gratitude && !mood) {
+                console.log('Form is empty, showing warning');
+                // Let Django handle the validation, but add visual feedback
+                submitButton.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Please add some content!';
+                submitButton.classList.add('btn-warning');
+                submitButton.classList.remove('btn-primary');
+                
+                // Reset button after 3 seconds
+                setTimeout(() => {
+                    const buttonText = submitButton.textContent.includes('Update') ? 
+                        '<i class="fas fa-save me-2"></i>Update Entry' : 
+                        '<i class="fas fa-save me-2"></i>Save Entry';
+                    submitButton.innerHTML = buttonText;
+                    submitButton.classList.remove('btn-warning');
+                    submitButton.classList.add('btn-primary');
+                }, 3000);
+            } else {
+                console.log('Form has content, submitting');
+                // Form has content, show saving state
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
+                submitButton.disabled = true;
+            }
+        });
     }
-    
-    entryTypeSelect.addEventListener('change', updatePlaceholders);
-    updatePlaceholders(); // Set initial placeholders
 });
 </script>
 {% endblock %}
