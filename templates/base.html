@@ -168,18 +168,43 @@
         @media (max-width: 991.98px) {
             .navbar-brand {
                 font-size: 1.4rem; /* Smaller font on mobile */
-                flex-grow: 1; /* Allow it to grow but not push toggler to new line */
                 margin-right: 1rem; /* Add some spacing from toggler */
             }
             
-            .navbar > .container {
-                flex-wrap: nowrap; /* Prevent wrapping to new line */
+            /* Fix navbar collapse behavior - prevent layout shift */
+            .navbar-collapse {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border-radius: 0 0 15px 15px;
+                box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+                margin-top: 0;
+                z-index: 1000;
             }
             
-            .custom-navbar .container {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
+            /* Style the mobile menu items */
+            .navbar-nav {
+                padding: 1rem;
+                text-align: center;
+            }
+            
+            .navbar-nav .nav-item {
+                margin: 0.25rem 0;
+            }
+            
+            .navbar-nav .nav-link {
+                padding: 0.75rem 1rem !important;
+                margin: 0.25rem auto;
+                display: block;
+                border-radius: 10px;
+                max-width: 200px;
+                background: rgba(255,255,255,0.1);
+            }
+            
+            .navbar-nav .nav-link:hover {
+                background: rgba(255,255,255,0.2);
             }
         }
         
@@ -197,7 +222,7 @@
                 ✨ My Daily Wins Tracker
             </a>
             
-            <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             
