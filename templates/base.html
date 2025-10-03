@@ -157,10 +157,30 @@
             border: 2px solid rgba(255,255,255,0.3);
             border-radius: 15px;
             padding: 8px 12px;
+            flex-shrink: 0; /* Prevent the toggler from shrinking */
         }
         
         .navbar-toggler:focus {
             box-shadow: 0 0 0 0.2rem rgba(255,255,255,0.25);
+        }
+        
+        /* Ensure navbar brand doesn't take up too much space on mobile */
+        @media (max-width: 991.98px) {
+            .navbar-brand {
+                font-size: 1.4rem; /* Smaller font on mobile */
+                flex-grow: 1; /* Allow it to grow but not push toggler to new line */
+                margin-right: 1rem; /* Add some spacing from toggler */
+            }
+            
+            .navbar > .container {
+                flex-wrap: nowrap; /* Prevent wrapping to new line */
+            }
+            
+            .custom-navbar .container {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
         }
         
         /* Main container spacing */
@@ -173,11 +193,11 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark custom-navbar">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">
+            <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
                 ✨ My Daily Wins Tracker
             </a>
             
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             
