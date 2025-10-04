@@ -6,6 +6,34 @@
     {% if is_editing %}Edit Entry{% else %}New {% if entry_type == 'win' %}Win{% else %}Gratitude{% endif %} Entry{% endif %} - Daily Wins Tracker
 {% endblock %}
 
+{% block extra_css %}
+<style>
+/* Category styling to match modal */
+.category-color-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px #dee2e6;
+}
+
+.gratitude-section {
+    background: rgba(248, 249, 250, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.form-check-label {
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.category-checkboxes .form-check {
+    padding: 0.25rem 0;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <!-- Main entry form page -->
 <div class="row justify-content-center">
@@ -192,32 +220,6 @@
         </div>
     </div>
 </div>
-
-<style>
-/* Category styling to match modal */
-.category-color-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    display: inline-block;
-    border: 2px solid #fff;
-    box-shadow: 0 0 0 1px #dee2e6;
-}
-
-.gratitude-section {
-    background: rgba(248, 249, 250, 0.8);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.form-check-label {
-    font-size: 0.9rem;
-    cursor: pointer;
-}
-
-.category-checkboxes .form-check {
-    padding: 0.25rem 0;
-}
-</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
