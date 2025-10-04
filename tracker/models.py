@@ -12,7 +12,7 @@ User = get_user_model()
 
 class Category(models.Model):
     """
-    Categories for organizing entries - Work, Health, Personal etc.
+    Categories for organising entries - Work, Health, Personal etc.
     User-specific so no cross-contamination between users.
     """
     
