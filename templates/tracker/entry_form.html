@@ -14,13 +14,14 @@
     height: 12px;
     border-radius: 50%;
     display: inline-block;
-    border: 2px solid #fff;
+    border: 2px solid white;
     box-shadow: 0 0 0 1px #dee2e6;
+    margin-right: 8px;
 }
 
 .gratitude-section {
-    background: rgba(248, 249, 250, 0.8);
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #ffc107;
+    background: linear-gradient(135deg, #fff8e7 0%, #ffffff 100%);
 }
 
 .form-check-label {
@@ -30,6 +31,46 @@
 
 .category-checkboxes .form-check {
     padding: 0.25rem 0;
+}
+
+/* Enhanced category styling to match modal */
+.category-checkboxes {
+    max-height: 160px;
+    overflow-y: auto;
+    padding: 4px 0;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    background-color: #fafafa;
+}
+
+.category-checkboxes .form-check {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    margin: 2px 4px;
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    min-height: 36px;
+}
+
+.category-checkboxes .form-check:hover {
+    background-color: #f8f9fa;
+    border-color: #007bff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,123,255,0.15);
+}
+
+.category-checkboxes .form-check-input {
+    margin-right: 8px;
+}
+
+.category-checkboxes .form-check-label {
+    flex: 1;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
 }
 </style>
 {% endblock %}
@@ -185,7 +226,7 @@
                                                    id="category_{{ category.pk }}"
                                                    {% if category in form.categories.value %}checked{% endif %}>
                                             <label class="form-check-label d-flex align-items-center" for="category_{{ category.pk }}">
-                                                <span class="category-color-dot me-2" style="background-color: {{ category.color }};"></span>
+                                                <span class="category-color-dot" style="background-color: {{ category.color }};"></span>
                                                 {{ category.name }}
                                             </label>
                                         </div>
