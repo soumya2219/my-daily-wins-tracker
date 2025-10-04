@@ -6,7 +6,7 @@
     {% if is_editing %}Edit Entry{% else %}New {% if entry_type == 'win' %}Win{% else %}Gratitude{% endif %} Entry{% endif %} - Daily Wins Tracker
 {% endblock %}
 
-{% block extra_css %}
+{% block content %}
 <style>
 /* Category styling to match modal */
 .category-color-dot {
@@ -73,9 +73,7 @@
     align-items: center;
 }
 </style>
-{% endblock %}
 
-{% block content %}
 <!-- Main entry form page -->
 <div class="row justify-content-center">
     <div class="col-lg-8">
@@ -85,15 +83,10 @@
                     <div>
                         {% if is_editing %}
                             <h3>✏️ Edit Your Entry</h3>
-                            <p class="mb-0 text-muted">Update your {{ entry.get_entry_type_display|lower }}</p>
+                            <p class="mb-0 text-muted">Update your entry details</p>
                         {% else %}
-                            {% if entry_type == 'win' %}
-                                <h3>🏆 Add a New Win</h3>
-                                <p class="mb-0 text-muted">Celebrate your accomplishment!</p>
-                            {% else %}
-                                <h3>🙏 Add Gratitude</h3>
-                                <p class="mb-0 text-muted">Express what you're thankful for</p>
-                            {% endif %}
+                            <h3>🏆 Add New Entry</h3>
+                            <p class="mb-0 text-muted">Record your wins and gratitude for today</p>
                         {% endif %}
                     </div>
                     <div>

@@ -42,7 +42,7 @@ class EntryForm(forms.ModelForm):
             })
         }
         help_texts = {
-            'entry_date': 'Which date is this entry for?',
+            'entry_date': '',  # Self-explanatory field
             'title': '',  # Remove redundant help text - we have clear label and placeholder
             'content': '',  # Remove redundant help text - we have the tip in the template
             'mood_rating': 'How was your overall mood today?',
