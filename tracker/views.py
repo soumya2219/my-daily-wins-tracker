@@ -77,8 +77,16 @@ def weekly_dashboard(request):
         entry_date__range=[target_week_start, week_end]
     )
     
+    # Only count entries that actually have content
+    week_entries_with_content = week_entries.filter(
+        Q(title__isnull=False, title__gt='') |
+        Q(content__isnull=False, content__gt='') |
+        Q(gratitude_text__isnull=False, gratitude_text__gt='') |
+        Q(mood_rating__isnull=False)
+    )
+    
     week_stats = {
-        'entries_count': week_entries.count(),
+        'entries_count': week_entries_with_content.count(),
         'avg_mood': None,
         'mood_trend': None,
     }
