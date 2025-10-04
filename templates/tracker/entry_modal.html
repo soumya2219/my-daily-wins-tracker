@@ -1,13 +1,15 @@
 <!-- Entry Modal Content -->
-<div class="modal-header bg-primary text-white">
-    <h5 class="modal-title">
+<div class="modal-header text-white py-3 d-flex align-items-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: relative;">
+    <!-- Subtle rainbow accent at bottom -->
+    <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #ff6b6b, #ffa726, #66bb6a, #42a5f5, #ab47bc); opacity: 0.8;"></div>
+    <h6 class="modal-title mb-0 d-flex align-items-center">
         <i class="fas fa-calendar-day me-2"></i>
         {% if created %}
-            Add Entry for {{ entry_date|date:"l, F j, Y" }}
+            Add Entry for {{ entry_date|date:"M j, Y" }}
         {% else %}
-            Edit Entry for {{ entry_date|date:"l, F j, Y" }}
+            Edit Entry for {{ entry_date|date:"M j, Y" }}
         {% endif %}
-    </h5>
+    </h6>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -22,7 +24,7 @@
             <!-- Left Column: Win Title & Content -->
             <div class="col-md-8">
                 <!-- Highlight of the Day -->
-                <div class="mb-3">
+                <div class="mb-2">
                     <label for="{{ form.title.id_for_label }}" class="form-label">
                         <i class="fas fa-star text-warning me-2"></i>
                         <strong>Highlight of the Day</strong>
@@ -38,24 +40,33 @@
                 </div>
                 
                 <!-- Win Details -->
-                <div class="mb-3">
+                <div class="mb-2">
                     <label for="{{ form.content.id_for_label }}" class="form-label">
                         <i class="fas fa-list-ul text-info me-2"></i>
                         <strong>Your Daily Wins</strong>
-                        <small class="text-muted">(Each win on a new line)</small>
+                        <small class="text-muted">(Start each win on a new line - they'll automatically become bullet points!)</small>
                     </label>
                     {{ form.content }}
-                    <div class="form-text">
-                        <small class="text-muted">
-                            💡 <strong>Tip:</strong> Start each win on a new line - they'll automatically become bullet points!
-                        </small>
-                    </div>
                     {% if form.content.help_text %}
                         <div class="form-text">{{ form.content.help_text }}</div>
                     {% endif %}
                     {% if form.content.errors %}
                         <div class="text-danger small">{{ form.content.errors.0 }}</div>
                     {% endif %}
+                </div>
+                
+                <!-- Gratitude Section -->
+                <div class="mb-3">
+                    <div class="gratitude-section p-2 bg-light rounded">
+                        <label for="{{ form.gratitude_text.id_for_label }}" class="form-label">
+                            <i class="fas fa-heart text-danger me-2"></i>
+                            <strong>Today I was grateful for...</strong>
+                        </label>
+                        {{ form.gratitude_text }}
+                        {% if form.gratitude_text.errors %}
+                            <div class="text-danger small">{{ form.gratitude_text.errors.0 }}</div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
             
@@ -126,25 +137,6 @@
             </div>
         </div>
         
-        <!-- Gratitude Section -->
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="gratitude-section p-3 bg-light rounded">
-                    <label for="{{ form.gratitude_text.id_for_label }}" class="form-label">
-                        <i class="fas fa-heart text-danger me-2"></i>
-                        <strong>Today I was grateful for...</strong>
-                    </label>
-                    {{ form.gratitude_text }}
-                    {% if form.gratitude_text.help_text %}
-                        <div class="form-text">{{ form.gratitude_text.help_text }}</div>
-                    {% endif %}
-                    {% if form.gratitude_text.errors %}
-                        <div class="text-danger small">{{ form.gratitude_text.errors.0 }}</div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        
         <!-- Form Errors -->
         {% if form.errors %}
             <div class="alert alert-warning alert-dismissible fade show mt-3" role="alert">
@@ -180,6 +172,17 @@
 </div>
 
 <style>
+/* Compact modal header */
+.modal-header.py-2 {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+}
+
+.modal-header .modal-title {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
 .gratitude-section {
     border-left: 4px solid #ffc107;
     background: linear-gradient(135deg, #fff8e7 0%, #ffffff 100%);
@@ -325,7 +328,9 @@
 <div class="modal fade" id="categoryManagerModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header bg-info text-white">
+            <div class="modal-header text-white" style="background: linear-gradient(135deg, #ff9a56 0%, #ff6b95 100%); position: relative;">
+                <!-- Subtle rainbow accent at bottom -->
+                <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #ff6b6b, #ffa726, #66bb6a, #42a5f5, #ab47bc); opacity: 0.8;"></div>
                 <h5 class="modal-title">
                     <i class="fas fa-tags me-2"></i>Manage Categories
                 </h5>
