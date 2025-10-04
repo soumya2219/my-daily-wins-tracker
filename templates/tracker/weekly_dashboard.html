@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load win_filters %}
 
 {% block title %}My Daily Wins - Week of {{ week_label }}{% endblock %}
 
@@ -917,7 +918,7 @@
                         {% endif %}
                         
                         {% if day.entry.content %}
-                            <div style="color: #6c757d; font-size: 0.95rem; line-height: 1.4; margin-bottom: 10px;">{{ day.entry.content|truncatechars:80 }}</div>
+                            <div style="color: #6c757d; font-size: 0.95rem; line-height: 1.4; margin-bottom: 10px;">{{ day.entry.content|format_wins_truncate:80 }}</div>
                         {% endif %}
                         
         {% if day.entry.mood_rating %}
