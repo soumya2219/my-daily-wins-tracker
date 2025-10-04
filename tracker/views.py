@@ -14,6 +14,31 @@ import json
 from .models import Entry, Category, StickyNote
 
 
+def create_default_categories(user):
+    """Create a set of starter categories for new users"""
+    default_categories = [
+        {'name': 'Work', 'color': '#007bff', 'description': 'Professional achievements and career wins'},
+        {'name': 'Health', 'color': '#28a745', 'description': 'Physical and mental wellness victories'},
+        {'name': 'Personal', 'color': '#ffc107', 'description': 'Personal growth and life achievements'},
+        {'name': 'Relationships', 'color': '#e83e8c', 'description': 'Social connections and meaningful interactions'},
+    ]
+    
+    created_categories = []
+    for cat_data in default_categories:
+        category, created = Category.objects.get_or_create(
+            user=user,
+            name=cat_data['name'],
+            defaults={
+                'color': cat_data['color'],
+                'description': cat_data['description']
+            }
+        )
+        if created:
+            created_categories.append(category)
+    
+    return created_categories
+
+
 # Authentication Views
 from .forms import EntryForm, QuickEntryForm, CategoryForm
 
@@ -249,7 +274,12 @@ def register_view(request):
         if form.is_valid():
             user = form.save()
             username = form.cleaned_data.get('username')
-            messages.success(request, f'Account created for {username}! You can now log in.')
+            
+            # Create default categories for the new user
+            created_categories = create_default_categories(user)
+            categories_count = len(created_categories)
+            
+            messages.success(request, f'Account created for {username}! We\'ve added {categories_count} starter categories to help you get organised.')
             
             # Log them in automatically - one less step
             login(request, user)
