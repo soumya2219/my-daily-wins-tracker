@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load widget_tweaks %}
+{% load win_filters %}
 
 {% block title %}
     {% if is_editing %}Edit Entry{% else %}New {% if entry_type == 'win' %}Win{% else %}Gratitude{% endif %} Entry{% endif %} - Daily Wins Tracker
@@ -61,8 +62,9 @@
                     
                     <!-- Entry Date -->
                     <div class="mb-4">
-                        <label for="{{ form.entry_date.id_for_label }}" class="form-label fw-bold">
-                            Entry Date
+                        <label for="{{ form.entry_date.id_for_label }}" class="form-label">
+                            <i class="fas fa-calendar-alt text-primary me-2"></i>
+                            <strong>Entry Date</strong>
                         </label>
                         {{ form.entry_date }}
                         {% if form.entry_date.help_text %}
@@ -73,99 +75,106 @@
                         {% endif %}
                     </div>
 
-                    <!-- Title -->
-                    <div class="mb-4">
-                        <label for="{{ form.title.id_for_label }}" class="form-label fw-bold">
-                            Title <span class="text-muted">(optional)</span>
-                        </label>
-                        {{ form.title }}
-                        {% if form.title.help_text %}
-                            <div class="form-text">{{ form.title.help_text }}</div>
-                        {% endif %}
-                        {% if form.title.errors %}
-                            <div class="text-danger small">{{ form.title.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-
-                    <!-- Content -->
-                    <div class="mb-4">
-                        <label for="{{ form.content.id_for_label }}" class="form-label fw-bold">
-                            Details *
-                        </label>
-                        {{ form.content }}
-                        {% if form.content.help_text %}
-                            <div class="form-text">{{ form.content.help_text }}</div>
-                        {% endif %}
-                        {% if form.content.errors %}
-                            <div class="text-danger small">{{ form.content.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-
-                    <!-- Mood Rating -->
-                    <div class="mb-4">
-                        <label for="{{ form.mood_rating.id_for_label }}" class="form-label fw-bold">
-                            Mood Rating (Optional)
-                        </label>
-                        <div class="row align-items-center">
-                            <div class="col-md-6">
-                                {{ form.mood_rating }}
+                    <div class="row">
+                        <!-- Left Column: Win Title & Content -->
+                        <div class="col-md-8">
+                            <!-- Highlight of the Day -->
+                            <div class="mb-2">
+                                <label for="{{ form.title.id_for_label }}" class="form-label">
+                                    <i class="fas fa-star text-warning me-2"></i>
+                                    <strong>Highlight of the Day</strong>
+                                    <small class="text-muted">(What stood out most today?)</small>
+                                </label>
+                                {{ form.title }}
+                                {% if form.title.help_text %}
+                                    <div class="form-text">{{ form.title.help_text }}</div>
+                                {% endif %}
+                                {% if form.title.errors %}
+                                    <div class="text-danger small">{{ form.title.errors.0 }}</div>
+                                {% endif %}
                             </div>
-                            <div class="col-md-6">
-                                <div class="d-flex justify-content-between small text-muted">
-                                    <span>😢 Low (1)</span>
-                                    <span>😊 Good (5)</span>
-                                    <span>🤩 Amazing (10)</span>
+                            
+                            <!-- Win Details -->
+                            <div class="mb-2">
+                                <label for="{{ form.content.id_for_label }}" class="form-label">
+                                    <i class="fas fa-list-ul text-info me-2"></i>
+                                    <strong>Your Daily Wins</strong>
+                                    <small class="text-muted">(Start each win on a new line - they'll automatically become bullet points!)</small>
+                                </label>
+                                {{ form.content }}
+                                {% if form.content.help_text %}
+                                    <div class="form-text">{{ form.content.help_text }}</div>
+                                {% endif %}
+                                {% if form.content.errors %}
+                                    <div class="text-danger small">{{ form.content.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Gratitude Section -->
+                            <div class="mb-3">
+                                <div class="gratitude-section p-2 bg-light rounded">
+                                    <label for="{{ form.gratitude_text.id_for_label }}" class="form-label">
+                                        <i class="fas fa-heart text-danger me-2"></i>
+                                        <strong>Today I was grateful for...</strong>
+                                    </label>
+                                    {{ form.gratitude_text }}
+                                    {% if form.gratitude_text.errors %}
+                                        <div class="text-danger small">{{ form.gratitude_text.errors.0 }}</div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
-                        {% if form.mood_rating.help_text %}
-                            <div class="form-text">{{ form.mood_rating.help_text }}</div>
-                        {% endif %}
-                        {% if form.mood_rating.errors %}
-                            <div class="text-danger small">{{ form.mood_rating.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-
-                    <!-- Categories -->
-                    {% if form.categories.field.queryset %}
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">Categories (Optional)</label>
-                            <div class="row">
-                                {% for category in form.categories.field.queryset %}
-                                    <div class="col-md-6 col-lg-4 mb-2">
-                                        <div class="form-check">
+                        
+                        <!-- Right Column: Mood & Categories -->
+                        <div class="col-md-4">
+                            <!-- Mood Rating -->
+                            <div class="mb-3">
+                                <label for="{{ form.mood_rating.id_for_label }}" class="form-label">
+                                    <i class="fas fa-smile text-success me-2"></i>
+                                    <strong>How was your mood?</strong>
+                                </label>
+                                {{ form.mood_rating }}
+                                {% if form.mood_rating.help_text %}
+                                    <div class="form-text">{{ form.mood_rating.help_text }}</div>
+                                {% endif %}
+                                {% if form.mood_rating.errors %}
+                                    <div class="text-danger small">{{ form.mood_rating.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Categories -->
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-tags text-secondary me-2"></i>
+                                    <strong>Categories</strong>
+                                </label>
+                                <div class="category-checkboxes">
+                                    {% for category in form.categories.field.queryset %}
+                                        <div class="form-check mb-1">
                                             <input class="form-check-input" type="checkbox" 
                                                    name="categories" 
                                                    value="{{ category.pk }}"
                                                    id="category_{{ category.pk }}"
                                                    {% if category in form.categories.value %}checked{% endif %}>
-                                            <label class="form-check-label" for="category_{{ category.pk }}">
-                                                <span class="badge me-1" style="background-color: {{ category.color }};">&nbsp;</span>
+                                            <label class="form-check-label d-flex align-items-center" for="category_{{ category.pk }}">
+                                                <span class="category-color-dot me-2" style="background-color: {{ category.color }};"></span>
                                                 {{ category.name }}
                                             </label>
                                         </div>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                            {% if form.categories.help_text %}
-                                <div class="form-text">{{ form.categories.help_text }}</div>
-                            {% endif %}
-                            {% if form.categories.errors %}
-                                <div class="text-danger small">{{ form.categories.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                    {% else %}
-                        <div class="mb-4">
-                            <div class="alert alert-info">
-                                <strong>💡 Tip:</strong> 
-                                <a href="{% url 'category_create' %}" class="alert-link">Create categories</a> 
-                                to organise your entries!
+                                    {% endfor %}
+                                </div>
+                                {% if form.categories.help_text %}
+                                    <div class="form-text">{{ form.categories.help_text }}</div>
+                                {% endif %}
+                                {% if form.categories.errors %}
+                                    <div class="text-danger small">{{ form.categories.errors.0 }}</div>
+                                {% endif %}
                             </div>
                         </div>
-                    {% endif %}
+                    </div>
 
                     <!-- Buttons -->
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
                         <a href="{% if is_editing %}{% url 'entry_detail' entry.pk %}{% else %}{% url 'dashboard' %}{% endif %}" 
                            class="btn btn-outline-secondary">
                             Cancel
@@ -183,6 +192,32 @@
         </div>
     </div>
 </div>
+
+<style>
+/* Category styling to match modal */
+.category-color-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px #dee2e6;
+}
+
+.gratitude-section {
+    background: rgba(248, 249, 250, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.form-check-label {
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.category-checkboxes .form-check {
+    padding: 0.25rem 0;
+}
+</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
