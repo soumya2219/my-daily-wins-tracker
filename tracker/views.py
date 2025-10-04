@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib import messages
 from .validators import validate_username
 from .auth_forms import CustomUserCreationForm
@@ -9,8 +9,12 @@ from django.db.models import Count, Q
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from datetime import date, timedelta, datetime
+import calendar
 import json
-from .models import Entry, Category
+from .models import Entry, Category, StickyNote
+
+
+# Authentication Views
 from .forms import EntryForm, QuickEntryForm, CategoryForm
 
 
@@ -84,7 +88,49 @@ def weekly_dashboard(request):
     if mood_entries.exists():
         total_mood = sum(entry.mood_rating for entry in mood_entries)
         week_stats['avg_mood'] = round(total_mood / mood_entries.count(), 1)
+
+    # Generate calendar for current month
+    today = date.today()
+    cal = calendar.Calendar(firstweekday=0)  # Monday is first day
+    month_days = cal.monthdayscalendar(today.year, today.month)
     
+    # Get all user entries for current month to highlight days with entries
+    month_start = date(today.year, today.month, 1)
+    if today.month == 12:
+        month_end = date(today.year + 1, 1, 1) - timedelta(days=1)
+    else:
+        month_end = date(today.year, today.month + 1, 1) - timedelta(days=1)
+    
+    month_entries = Entry.objects.filter(
+        user=request.user,
+        entry_date__range=[month_start, month_end]
+    )
+    entry_dates = set(month_entries.values_list('entry_date', flat=True))
+    
+    # Build calendar data with entry information
+    calendar_weeks = []
+    for week in month_days:
+        calendar_week = []
+        for day in week:
+            if day == 0:
+                calendar_week.append({
+                    'day': '',
+                    'is_today': False,
+                    'has_entry': False,
+                    'date': None
+                })
+            else:
+                day_date = date(today.year, today.month, day)
+                calendar_week.append({
+                    'day': day,
+                    'is_today': day_date == today,
+                    'has_entry': day_date in entry_dates,
+                    'date': day_date
+                })
+        calendar_weeks.append(calendar_week)
+    
+    month_name = today.strftime('%B %Y')
+
     context = {
         'week_days': week_days,
         'week_start': target_week_start,
@@ -93,6 +139,11 @@ def weekly_dashboard(request):
         'next_week': next_week,
         'week_stats': week_stats,
         'is_current_week': week_offset == 0,
+        'calendar_weeks': calendar_weeks,
+        'month_name': month_name,
+        'calendar_month': today.month - 1,  # JavaScript months are 0-indexed
+        'calendar_year': today.year,
+        'sticky_notes': request.user.sticky_notes.all()[:6],  # Limit to 6 notes for UI
     }
     return render(request, 'tracker/weekly_dashboard.html', context)
 
@@ -559,5 +610,174 @@ def category_ajax_delete(request, pk):
                 'success': False,
                 'error': 'Category not found'
             })
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+
+@login_required
+def get_calendar_data(request):
+    """AJAX view to get calendar data for a specific month"""
+    month = int(request.GET.get('month', date.today().month))
+    year = int(request.GET.get('year', date.today().year))
+    today = date.today()
+    
+    cal = calendar.Calendar(firstweekday=0)  # Monday is first day
+    month_days = cal.monthdayscalendar(year, month)
+    
+    # Get entries for the requested month
+    month_start = date(year, month, 1)
+    if month == 12:
+        month_end = date(year + 1, 1, 1) - timedelta(days=1)
+    else:
+        month_end = date(year, month + 1, 1) - timedelta(days=1)
+    
+    month_entries = Entry.objects.filter(
+        user=request.user,
+        entry_date__range=[month_start, month_end]
+    )
+    entry_dates = set(month_entries.values_list('entry_date', flat=True))
+    
+    # Generate HTML for calendar grid
+    calendar_html = ""
+    for week in month_days:
+        calendar_html += '<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-bottom: 2px;">'
+        for day in week:
+            if day == 0:
+                calendar_html += '<div class="calendar-day-compact calendar-empty-compact"></div>'
+            else:
+                day_date = date(year, month, day)
+                classes = ['calendar-day-compact']
+                onclick = ""
+                
+                if day_date == today:
+                    classes.append('calendar-today-compact')
+                if day_date in entry_dates:
+                    classes.append('calendar-has-entry-compact')
+                    onclick = f'onclick="showDayEntry(\'{day_date.strftime("%Y-%m-%d")}\'))"'
+                
+                calendar_html += f'''
+                    <div class="{' '.join(classes)}" {onclick}>
+                        {day}
+                        {'<span class="entry-dot-compact">●</span>' if day_date in entry_dates else ''}
+                    </div>
+                '''
+        calendar_html += '</div>'
+    
+    month_name = date(year, month, 1).strftime('%B %Y')
+    
+    return JsonResponse({
+        'calendar_html': calendar_html,
+        'month_name': month_name
+    })
+
+
+@login_required
+def get_day_entry(request):
+    """AJAX view to get entry details for a specific day"""
+    date_str = request.GET.get('date')
+    try:
+        entry_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        entry = Entry.objects.get(user=request.user, entry_date=entry_date)
+        
+        return JsonResponse({
+            'entry': {
+                'title': entry.title,
+                'description': entry.content,
+                'mood_rating': entry.mood_rating,
+                'category': entry.category.name if entry.category else None,
+                'date': entry.entry_date.strftime('%B %d, %Y'),
+                'created_at': entry.created_at.strftime('%B %d, %Y at %I:%M %p'),
+            }
+        })
+    except (Entry.DoesNotExist, ValueError):
+        return JsonResponse({'entry': None})
+
+
+@login_required
+def sticky_note_create(request):
+    """AJAX view to create a new sticky note"""
+    if request.method == 'POST':
+        content = request.POST.get('content', '').strip()
+        if content:
+            # Get next order number
+            last_note = request.user.sticky_notes.order_by('-order').first()
+            next_order = (last_note.order + 1) if last_note else 0
+            
+            note = StickyNote.objects.create(
+                user=request.user,
+                content=content,
+                order=next_order
+            )
+            
+            return JsonResponse({
+                'success': True,
+                'note': {
+                    'id': note.id,
+                    'content': note.content,
+                    'created_at': note.created_at.strftime('%B %d, %Y at %I:%M %p'),
+                }
+            })
+        else:
+            return JsonResponse({'success': False, 'error': 'Content cannot be empty'})
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+
+@login_required
+def sticky_note_update(request, note_id):
+    """AJAX view to update sticky note content"""
+    if request.method == 'POST':
+        try:
+            note = StickyNote.objects.get(id=note_id, user=request.user)
+            content = request.POST.get('content', '').strip()
+            
+            if content:
+                note.content = content
+                note.save()
+                return JsonResponse({'success': True})
+            else:
+                # If content is empty, delete the note
+                note.delete()
+                return JsonResponse({'success': True, 'deleted': True})
+                
+        except StickyNote.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Note not found'})
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+
+@login_required
+def sticky_note_complete(request, note_id):
+    """AJAX view to complete a sticky note and convert it to a win"""
+    if request.method == 'POST':
+        try:
+            note = StickyNote.objects.get(id=note_id, user=request.user)
+            entry = note.complete_as_win()
+            
+            return JsonResponse({
+                'success': True,
+                'entry': {
+                    'title': entry.title,
+                    'date': entry.entry_date.strftime('%B %d, %Y'),
+                }
+            })
+            
+        except StickyNote.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Note not found'})
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+
+@login_required
+def sticky_note_delete(request, note_id):
+    """AJAX view to delete a sticky note"""
+    if request.method == 'DELETE':
+        try:
+            note = StickyNote.objects.get(id=note_id, user=request.user)
+            note.delete()
+            return JsonResponse({'success': True})
+            
+        except StickyNote.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Note not found'})
     
     return JsonResponse({'success': False, 'error': 'Invalid request method'})

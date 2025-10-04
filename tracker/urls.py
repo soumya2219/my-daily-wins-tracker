@@ -36,4 +36,14 @@ urlpatterns = [
     path("categories/ajax/create/", views.category_ajax_create, name="category_ajax_create"),
     path("categories/ajax/list/", views.category_ajax_list, name="category_ajax_list"),
     path("categories/<int:pk>/ajax/delete/", views.category_ajax_delete, name="category_ajax_delete"),
+    
+    # AJAX endpoints for calendar functionality
+    path("get-calendar-data/", views.get_calendar_data, name="get_calendar_data"),
+    path("get-day-entry/", views.get_day_entry, name="get_day_entry"),
+    
+    # AJAX endpoints for sticky notes
+    path("sticky-notes/create/", views.sticky_note_create, name="sticky_note_create"),
+    path("sticky-notes/<int:note_id>/update/", views.sticky_note_update, name="sticky_note_update"),
+    path("sticky-notes/<int:note_id>/complete/", views.sticky_note_complete, name="sticky_note_complete"),
+    path("sticky-notes/<int:note_id>/delete/", views.sticky_note_delete, name="sticky_note_delete"),
 ]
