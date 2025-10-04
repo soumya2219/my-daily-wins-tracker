@@ -21,13 +21,13 @@ class EntryForm(forms.ModelForm):
             }),
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Summary of today (e.g., "Productive day at work")',
+                'placeholder': 'What was the highlight of your day? (e.g., "Finished presentation", "Had quality time with family")',
                 'maxlength': 200
             }),
             'content': forms.Textarea(attrs={
                 'class': 'form-control',
-                'placeholder': 'List your wins here:\n• Completed project milestone\n• Had a great conversation with a friend\n• Learned something new\n• Made healthy choices...',
-                'rows': 5
+                'placeholder': 'List your wins (one per line):\nCompleted project milestone\nHad a great conversation with a friend\nLearned something new\nMade healthy choices\nHelped someone out',
+                'rows': 6
             }),
             'mood_rating': forms.Select(attrs={
                 'class': 'form-select'
@@ -43,11 +43,11 @@ class EntryForm(forms.ModelForm):
         }
         help_texts = {
             'entry_date': 'Which date is this entry for?',
-            'title': 'A short summary of your day (optional)',
-            'content': 'List all your wins and achievements for the day',
+            'title': '',  # Remove redundant help text - we have clear label and placeholder
+            'content': '',  # Remove redundant help text - we have the tip in the template
             'mood_rating': 'How was your overall mood today?',
             'gratitude_text': 'What are you grateful for today?',
-            'categories': 'Optional: organize this entry with categories'
+            'categories': ''  # Remove redundant help text - label is clear enough
         }
 
     def __init__(self, *args, **kwargs):
