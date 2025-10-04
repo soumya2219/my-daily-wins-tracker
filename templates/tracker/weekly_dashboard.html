@@ -714,53 +714,112 @@
         </div>
     </div>
     
+    <!-- Week Navigation Enhanced Styles -->
+    <style>
+        .week-nav-btn {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .week-nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .week-nav-btn:hover::before {
+            left: 100%;
+        }
+        
+        .week-nav-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .week-nav-current:hover {
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+        }
+        
+        .week-nav-btn:active {
+            transform: translateY(-1px) scale(1.01);
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .week-nav-btn {
+                font-size: 0.85rem !important;
+                padding: 12px 18px !important;
+            }
+        }
+    </style>
+
     <!-- Week Navigation -->
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px;">
-        <a href="?week={{ prev_week }}" style="
+        <a href="?week={{ prev_week }}" class="week-nav-btn week-nav-prev" style="
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 12px 20px;
-            background: #6c757d;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             text-decoration: none;
-            border-radius: 25px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        " onmouseover="this.style.background='#5a6268'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#6c757d'; this.style.transform='translateY(0)'">
-            ← Previous Week
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        ">
+            <span style="font-size: 1.1rem;">←</span>
+            <span>Previous Week</span>
         </a>
         
         {% if not is_current_week %}
-        <a href="{% url 'weekly_dashboard' %}" style="
+        <a href="{% url 'weekly_dashboard' %}" class="week-nav-btn week-nav-current" style="
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 12px 20px;
-            background: #28a745;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             color: white;
             text-decoration: none;
-            border-radius: 25px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+            position: relative;
+            overflow: hidden;
         ">
-            🏠 Current Week
+            <span style="font-size: 1.1rem;">🏠</span>
+            <span>Current Week</span>
         </a>
         {% endif %}
         
-        <a href="?week={{ next_week }}" style="
+        <a href="?week={{ next_week }}" class="week-nav-btn week-nav-next" style="
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 12px 20px;
-            background: #6c757d;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             text-decoration: none;
-            border-radius: 25px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        " onmouseover="this.style.background='#5a6268'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#6c757d'; this.style.transform='translateY(0)'">
-            Next Week →
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        ">
+            <span>Next Week</span>
+            <span style="font-size: 1.1rem;">→</span>
         </a>
     </div>
     
