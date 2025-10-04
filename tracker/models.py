@@ -163,3 +163,49 @@ def ensure_same_user_for_categories(sender, instance, action, reverse, model, pk
         categories = Category.objects.filter(pk__in=pk_set).values_list('user_id', flat=True).distinct()
         if categories.count() > 1 or (categories and categories.first() != instance.user_id):
             raise ValidationError("You can only assign your own categories to your entries.")
+
+
+class StickyNote(models.Model):
+    """
+    Quick notes that can be converted to daily wins when completed.
+    Persistent until user decides to complete or delete them.
+    """
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sticky_notes')
+    content = models.CharField(max_length=200, blank=True)  # Allow quick jotting
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    order = models.IntegerField(default=0)  # For future drag & drop functionality
+    
+    class Meta:
+        ordering = ['order', 'created_at']
+        indexes = [
+            models.Index(fields=['user', 'order']),
+        ]
+    
+    def __str__(self):
+        return f"{self.user.username}: {self.content[:50]}..." if len(self.content) > 50 else f"{self.user.username}: {self.content}"
+    
+    def complete_as_win(self):
+        """Convert this sticky note to a daily win entry"""
+        from datetime import date
+        
+        # Create entry for today
+        entry = Entry.objects.create(
+            user=self.user,
+            title=f"✅ {self.content}",
+            entry_date=date.today(),
+            content=f"Completed from quick note: {self.content}"
+        )
+        
+        # Try to assign to "Quick Wins" category if it exists
+        try:
+            quick_wins_category = Category.objects.get(user=self.user, name__iexact="Quick Wins")
+            entry.categories.add(quick_wins_category)
+        except Category.DoesNotExist:
+            pass  # No worries if category doesn't exist
+        
+        # Delete the sticky note
+        self.delete()
+        
+        return entry
