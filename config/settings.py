@@ -176,11 +176,13 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"  # Where collectstatic puts files for production
 
-# For local development static files (uncomment if you have a /static folder):
-# STATICFILES_DIRS = [BASE_DIR / "static"]
+# For local development static files
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # Whitenoise for serving static files on Heroku with compression
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+# Note: Disabled for development to prevent aggressive caching during active development
+# Uncomment for production deployment:
+# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # -------------------------
 # Authentication URLs and Redirects
