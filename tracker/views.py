@@ -150,6 +150,7 @@ def weekly_dashboard(request):
                     'day': '',
                     'is_today': False,
                     'has_entry': False,
+                    'is_future': False,
                     'date': None
                 })
             else:
@@ -158,6 +159,7 @@ def weekly_dashboard(request):
                     'day': day,
                     'is_today': day_date == today,
                     'has_entry': day_date in entry_dates,
+                    'is_future': day_date > today,
                     'date': day_date
                 })
         calendar_weeks.append(calendar_week)
@@ -276,10 +278,9 @@ def register_view(request):
             username = form.cleaned_data.get('username')
             
             # Create default categories for the new user
-            created_categories = create_default_categories(user)
-            categories_count = len(created_categories)
+            create_default_categories(user)
             
-            messages.success(request, f'Account created for {username}! We\'ve added {categories_count} starter categories to help you get organised.')
+            messages.success(request, f'Welcome, {username}! Your account has been created successfully.')
             
             # Log them in automatically - one less step
             login(request, user)
@@ -354,11 +355,12 @@ def entry_list(request):
     if search_query:
         entries = entries.filter(
             Q(title__icontains=search_query) | 
-            Q(content__icontains=search_query)
+            Q(content__icontains=search_query) |
+            Q(gratitude_text__icontains=search_query)
         )
     
-    # Order by date (newest first)
-    entries = entries.distinct().order_by('-date_created')
+    # Order by entry date (newest first - the actual date the entry is for, not when it was created)
+    entries = entries.distinct().order_by('-entry_date')
     
     # Pagination
     paginator = Paginator(entries, 10)  # 10 entries per page
@@ -391,18 +393,48 @@ def entry_create(request):
     # Get entry type from URL parameter for UI display purposes
     entry_type = request.GET.get('type', 'win')  # Default to win for display
     
+    # Get date from URL parameter (from calendar clicks)
+    date_param = request.GET.get('date', None)
+    initial_date = None
+    
+    if date_param:
+        try:
+            initial_date = datetime.strptime(date_param, '%Y-%m-%d').date()
+        except ValueError:
+            # If invalid date format, just use today
+            initial_date = date.today()
+    
     if request.method == 'POST':
         form = EntryForm(request.POST, user=request.user)
         if form.is_valid():
-            entry = form.save()
-            messages.success(
-                request, 
-                '🎉 Your daily entry has been saved!'
-            )
-            return redirect('entry_detail', pk=entry.pk)
+            # Check if entry already exists for this date
+            entry_date = form.cleaned_data.get('entry_date')
+            try:
+                existing_entry = Entry.objects.get(user=request.user, entry_date=entry_date)
+                # Entry exists, redirect to edit it instead
+                messages.info(request, f'An entry already exists for {entry_date.strftime("%B %d, %Y")}. Redirecting to edit it.')
+                return redirect('entry_edit', pk=existing_entry.pk)
+            except Entry.DoesNotExist:
+                # No existing entry, safe to create
+                entry = form.save()
+                messages.success(
+                    request, 
+                    '🎉 Your daily entry has been saved!'
+                )
+                return redirect('weekly_dashboard')
     else:
-        # Create form without pre-populating entry_type since it no longer exists
-        form = EntryForm(user=request.user)
+        # Check if entry already exists for the initial date
+        if initial_date:
+            try:
+                existing_entry = Entry.objects.get(user=request.user, entry_date=initial_date)
+                # Entry exists, redirect to edit it instead
+                messages.info(request, f'An entry already exists for {initial_date.strftime("%B %d, %Y")}. Redirecting to edit it.')
+                return redirect('entry_edit', pk=existing_entry.pk)
+            except Entry.DoesNotExist:
+                # No existing entry, proceed with create form
+                form = EntryForm(user=request.user, initial={'entry_date': initial_date})
+        else:
+            form = EntryForm(user=request.user)
     
     context = {
         'form': form,
@@ -685,18 +717,32 @@ def get_calendar_data(request):
             else:
                 day_date = date(year, month, day)
                 classes = ['calendar-day-compact']
-                onclick = ""
+                has_entry = day_date in entry_dates
+                is_future = day_date > today
                 
+                # Add classes
                 if day_date == today:
                     classes.append('calendar-today-compact')
-                if day_date in entry_dates:
+                if has_entry:
                     classes.append('calendar-has-entry-compact')
-                    onclick = f'onclick="showDayEntry(\'{day_date.strftime("%Y-%m-%d")}\'))"'
+                if is_future:
+                    classes.append('calendar-future-day')
+                
+                # Make all non-future days clickable
+                onclick = ""
+                cursor_style = ""
+                title = ""
+                if not is_future:
+                    onclick = f'onclick="handleDayClick(\'{day_date.strftime("%Y-%m-%d")}\', {str(has_entry).lower()})"'
+                    cursor_style = 'style="cursor: pointer;"'
+                    title = f'title="{"View entry" if has_entry else "Add entry"}"'
+                elif is_future:
+                    title = 'title="Future date"'
                 
                 calendar_html += f'''
-                    <div class="{' '.join(classes)}" {onclick}>
+                    <div class="{' '.join(classes)}" data-date="{day_date.strftime('%Y-%m-%d')}" {onclick} {cursor_style} {title}>
                         {day}
-                        {'<span class="entry-dot-compact">●</span>' if day_date in entry_dates else ''}
+                        {'<span class="entry-dot-compact">●</span>' if has_entry else ''}
                     </div>
                 '''
         calendar_html += '</div>'
@@ -717,14 +763,18 @@ def get_day_entry(request):
         entry_date = datetime.strptime(date_str, '%Y-%m-%d').date()
         entry = Entry.objects.get(user=request.user, entry_date=entry_date)
         
+        # Get categories as a comma-separated string
+        category_names = ', '.join([cat.name for cat in entry.categories.all()])
+        
         return JsonResponse({
             'entry': {
+                'id': entry.id,
                 'title': entry.title,
                 'description': entry.content,
                 'mood_rating': entry.mood_rating,
-                'category': entry.category.name if entry.category else None,
+                'categories': category_names if category_names else None,
                 'date': entry.entry_date.strftime('%B %d, %Y'),
-                'created_at': entry.created_at.strftime('%B %d, %Y at %I:%M %p'),
+                'created_at': entry.date_created.strftime('%B %d, %Y at %I:%M %p'),
             }
         })
     except (Entry.DoesNotExist, ValueError):
@@ -792,11 +842,17 @@ def sticky_note_complete(request, note_id):
             note = StickyNote.objects.get(id=note_id, user=request.user)
             entry = note.complete_as_win()
             
+            # Refresh from database to ensure we have the latest data
+            entry.refresh_from_db()
+            
             return JsonResponse({
                 'success': True,
                 'entry': {
+                    'id': entry.id,
                     'title': entry.title,
+                    'content': entry.content,
                     'date': entry.entry_date.strftime('%B %d, %Y'),
+                    'has_content': entry.has_content,
                 }
             })
             
