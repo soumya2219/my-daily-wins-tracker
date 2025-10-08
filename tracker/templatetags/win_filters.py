@@ -19,17 +19,17 @@ def format_wins(content):
     if not lines:
         return ""
     
-    # If there's only one line, just return it as is
-    if len(lines) == 1:
-        return lines[0]
-    
-    # Convert each line to a bullet point
+    # Convert each line to a bullet point (even single lines)
     bullet_points = []
     for line in lines:
-        # Remove existing bullet characters if any (•, -, *, etc.)
-        clean_line = re.sub(r'^[•\-\*\+]\s*', '', line).strip()
-        if clean_line:
-            bullet_points.append(f'• {clean_line}')
+        # If line already starts with a checkmark, keep it as is (from completed sticky notes)
+        if line.startswith('✓'):
+            bullet_points.append(line)
+        else:
+            # Remove existing bullet characters if any (•, -, *, etc.)
+            clean_line = re.sub(r'^[•\-\*\+]\s*', '', line).strip()
+            if clean_line:
+                bullet_points.append(f'• {clean_line}')
     
     return mark_safe('<br>'.join(bullet_points))
 

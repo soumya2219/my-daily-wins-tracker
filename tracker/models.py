@@ -190,13 +190,25 @@ class StickyNote(models.Model):
         """Convert this sticky note to a daily win entry"""
         from datetime import date
         
-        # Create entry for today
-        entry = Entry.objects.create(
+        # Get or create today's entry
+        entry, created = Entry.objects.get_or_create(
             user=self.user,
-            title=f"✅ {self.content}",
             entry_date=date.today(),
-            content=f"Completed from quick note: {self.content}"
+            defaults={'title': '', 'content': '', 'gratitude_text': ''}
         )
+        
+        # Add checkmark instead of bullet point - it's more pronounced and shows completion
+        completed_text = f"✓ {self.content}"
+        
+        # Add the sticky note content to the daily wins (content field)
+        if entry.content:
+            # If there's already content, add this on a new line
+            entry.content += f"\n{completed_text}"
+        else:
+            # First win of the day
+            entry.content = completed_text
+        
+        entry.save()
         
         # Try to assign to "Quick Wins" category if it exists
         try:
