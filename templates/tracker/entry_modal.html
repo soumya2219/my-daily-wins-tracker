@@ -1,4 +1,6 @@
+{% load static %}
 <!-- Entry Modal Content -->
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
 <div class="modal-header text-white py-3 d-flex align-items-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: relative;">
     <!-- Subtle rainbow accent at bottom -->
     <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #ff6b6b, #ffa726, #66bb6a, #42a5f5, #ab47bc); opacity: 0.8;"></div>
@@ -170,159 +172,6 @@
         {% if created %}Save Entry{% else %}Update Entry{% endif %}
     </button>
 </div>
-
-<style>
-/* Compact modal header */
-.modal-header.py-2 {
-    padding-top: 0.5rem !important;
-    padding-bottom: 0.5rem !important;
-}
-
-.modal-header .modal-title {
-    font-size: 1rem;
-    font-weight: 600;
-}
-
-.gratitude-section {
-    border-left: 4px solid #ffc107;
-    background: linear-gradient(135deg, #fff8e7 0%, #ffffff 100%);
-}
-
-/* Custom Categories Styling */
-.category-checkboxes-custom {
-    max-height: 160px;
-    overflow-y: auto;
-    padding: 4px 0;
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    background-color: #fafafa;
-}
-
-.category-item {
-    display: flex;
-    align-items: center;
-    padding: 8px 12px;
-    margin: 2px 4px;
-    background: white;
-    border: 1px solid #e9ecef;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-    min-height: 36px;
-    cursor: pointer;
-}
-
-.category-item:hover {
-    background-color: #f8f9fa;
-    border-color: #007bff;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0,123,255,0.15);
-}
-
-.category-checkbox {
-    margin-right: 8px;
-    transform: scale(1.2);
-    cursor: pointer;
-}
-
-.category-label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    margin: 0;
-    font-weight: 500;
-    font-size: 0.9rem;
-    flex-grow: 1;
-}
-
-.category-color-dot {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    display: inline-block;
-    margin-right: 8px;
-    border: 2px solid white;
-    box-shadow: 0 0 0 1px #dee2e6;
-}
-
-/* Category manager modal improvements */
-.quick-category-form .card {
-    background-color: #f8f9fa;
-    border: 1px dashed #6c757d;
-}
-
-.quick-category-form .card-title {
-    color: #495057;
-    margin-bottom: 1rem;
-}
-
-#categoryManagerModal .list-group-item {
-    border-left: none;
-    border-right: none;
-    padding: 1rem;
-}
-
-#categoryManagerModal .list-group-item:first-child {
-    border-top: none;
-}
-
-#categoryManagerModal .list-group-item:last-child {
-    border-bottom: none;
-}
-
-.btn-outline-info {
-    border-width: 2px;
-}
-
-.no-categories-message {
-    padding: 20px;
-    text-align: center;
-    background: white;
-    border: 2px dashed #dee2e6;
-    border-radius: 8px;
-    margin: 8px;
-}
-
-.modal-body {
-    max-height: 70vh;
-    overflow-y: auto;
-}
-
-/* Style the form fields */
-.form-control, .form-select {
-    border-radius: 8px;
-    border: 1px solid #e0e6ed;
-    transition: all 0.3s ease;
-}
-
-.form-control:focus, .form-select:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-}
-
-/* Mood rating styling */
-#id_mood_rating option {
-    font-size: 1.1rem;
-}
-
-/* Quick category form styling */
-.quick-category-form {
-    background: #f8f9fa;
-    border: 1px dashed #dee2e6;
-    border-radius: 8px;
-    padding: 12px;
-    margin-top: 8px;
-}
-
-.category-color-preview {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    display: inline-block;
-    margin-left: 8px;
-    border: 2px solid #fff;
-    box-shadow: 0 0 0 1px #dee2e6;
-}
-</style>
 
 <!-- Category Management Modal -->
 <div class="modal fade" id="categoryManagerModal" tabindex="-1">
@@ -690,4 +539,5 @@ function refreshCategoriesInMainForm() {
         categoryModal.hide();
     }
 }
-</script>
+
+<script src="{% static 'js/forms.js' %}"></script>

@@ -1,96 +1,46 @@
 {% extends "base.html" %}
 {% load widget_tweaks %}
 {% load win_filters %}
+{% load static %}
 
 {% block title %}
     {% if is_editing %}Edit Entry{% else %}New {% if entry_type == 'win' %}Win{% else %}Gratitude{% endif %} Entry{% endif %} - Daily Wins Tracker
 {% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+{% endblock %}
+
 {% block content %}
-<style>
-/* Category styling to match modal */
-.category-color-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    display: inline-block;
-    border: 2px solid white;
-    box-shadow: 0 0 0 1px #dee2e6;
-    margin-right: 8px;
-}
-
-.gratitude-section {
-    border-left: 4px solid #ffc107;
-    background: linear-gradient(135deg, #fff8e7 0%, #ffffff 100%);
-}
-
-.form-check-label {
-    font-size: 0.9rem;
-    cursor: pointer;
-}
-
-.category-checkboxes .form-check {
-    padding: 0.25rem 0;
-}
-
-/* Enhanced category styling to match modal */
-.category-checkboxes {
-    max-height: 160px;
-    overflow-y: auto;
-    padding: 4px 0;
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    background-color: #fafafa;
-}
-
-.category-checkboxes .form-check {
-    display: flex;
-    align-items: center;
-    padding: 8px 12px;
-    margin: 2px 4px;
-    background: white;
-    border: 1px solid #e9ecef;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-    min-height: 36px;
-}
-
-.category-checkboxes .form-check:hover {
-    background-color: #f8f9fa;
-    border-color: #007bff;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0,123,255,0.15);
-}
-
-.category-checkboxes .form-check-input {
-    margin-right: 8px;
-}
-
-.category-checkboxes .form-check-label {
-    flex: 1;
-    margin-bottom: 0;
-    display: flex;
-    align-items: center;
-}
-</style>
 
 <!-- Main entry form page -->
 <div class="row justify-content-center">
     <div class="col-lg-8">
         <div class="card">
-            <div class="card-header">
+            <div class="card-header" style="
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border: none;
+                padding: 1.5rem;
+            ">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         {% if is_editing %}
-                            <h3>✏️ Edit Your Entry</h3>
-                            <p class="mb-0 text-muted">Update your entry details</p>
+                            <h3 style="color: white; margin-bottom: 0.5rem; font-weight: 600;">✏️ Edit Your Entry</h3>
+                            <p class="mb-0" style="color: rgba(255, 255, 255, 0.9); font-size: 0.95rem;">Update your entry details</p>
                         {% else %}
-                            <h3>🏆 Add New Entry</h3>
-                            <p class="mb-0 text-muted">Record your wins and gratitude for today</p>
+                            <h3 style="color: white; margin-bottom: 0.5rem; font-weight: 600;">🏆 Add New Entry</h3>
+                            <p class="mb-0" style="color: rgba(255, 255, 255, 0.9); font-size: 0.95rem;">Record your wins and gratitude for today</p>
                         {% endif %}
                     </div>
                     <div>
-                        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                        <a href="{% url 'dashboard' %}" class="btn btn-outline-primary" style="
+                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            border-color: #667eea;
+                            color: white;
+                            transition: all 0.3s ease;
+                        " onmouseover="this.style.background='rgba(255, 255, 255, 0.95)'; this.style.color='#667eea'; this.style.borderColor='#667eea';" 
+                           onmouseout="this.style.background='linear-gradient(135deg, #667eea 0%, #764ba2 100%)'; this.style.color='white'; this.style.borderColor='#667eea';">
                             ← Back to Dashboard
                         </a>
                     </div>
@@ -206,31 +156,47 @@
                             
                             <!-- Categories -->
                             <div class="mb-3">
-                                <label class="form-label">
-                                    <i class="fas fa-tags text-secondary me-2"></i>
-                                    <strong>Categories</strong>
-                                </label>
-                                <div class="category-checkboxes">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="form-label mb-0">
+                                        <i class="fas fa-tags text-secondary me-2"></i>
+                                        <strong>Categories</strong>
+                                    </label>
+                                    <a href="{% url 'category_list' %}" class="btn btn-outline-primary btn-sm" style="white-space: nowrap;">
+                                        <i class="fas fa-cog me-1"></i>Manage
+                                    </a>
+                                </div>
+                                
+                                <!-- Custom categories rendering matching modal style -->
+                                <div class="category-checkboxes-custom">
                                     {% for category in form.categories.field.queryset %}
-                                        <div class="form-check mb-1">
-                                            <input class="form-check-input" type="checkbox" 
-                                                   name="categories" 
-                                                   value="{{ category.pk }}"
-                                                   id="category_{{ category.pk }}"
-                                                   {% if category in form.categories.value %}checked{% endif %}>
-                                            <label class="form-check-label d-flex align-items-center" for="category_{{ category.pk }}">
-                                                <span class="category-color-dot" style="background-color: {{ category.color }};"></span>
-                                                {{ category.name }}
-                                            </label>
-                                        </div>
+                                    <div class="category-item">
+                                        <input 
+                                            type="checkbox" 
+                                            id="category_{{ category.id }}" 
+                                            name="categories" 
+                                            value="{{ category.id }}"
+                                            {% if form.categories.value and category.id in form.categories.value %}checked{% endif %}
+                                            class="category-checkbox">
+                                        <label for="category_{{ category.id }}" class="category-label">
+                                            <span class="category-color-dot" style="background-color: {{ category.color }};"></span>
+                                            {{ category.name }}
+                                        </label>
+                                    </div>
+                                    {% empty %}
+                                    <div class="no-categories-message">
+                                        <i class="fas fa-info-circle text-muted me-2"></i>
+                                        <span class="text-muted">No categories yet. Click "Manage" to create some!</span>
+                                    </div>
                                     {% endfor %}
                                 </div>
-                                {% if form.categories.help_text %}
-                                    <div class="form-text">{{ form.categories.help_text }}</div>
-                                {% endif %}
+                                
                                 {% if form.categories.errors %}
-                                    <div class="text-danger small">{{ form.categories.errors.0 }}</div>
+                                    <div class="text-danger small mt-2">{{ form.categories.errors.0 }}</div>
                                 {% endif %}
+                                <div class="text-muted small mt-2">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Select one or more categories to organise your wins
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -238,10 +204,25 @@
                     <!-- Buttons -->
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
                         <a href="{% if is_editing %}{% url 'entry_detail' entry.pk %}{% else %}{% url 'dashboard' %}{% endif %}" 
-                           class="btn btn-outline-secondary">
+                           class="btn btn-outline-secondary" style="
+                               border-color: #9e9e9e;
+                               color: #616161;
+                               padding: 0.5rem 1.5rem;
+                               transition: all 0.3s ease;
+                           " onmouseover="this.style.background='#f5f5f5'; this.style.borderColor='#757575';" 
+                              onmouseout="this.style.background='transparent'; this.style.borderColor='#9e9e9e';">
                             Cancel
                         </a>
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary" style="
+                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            border: none;
+                            color: white;
+                            padding: 0.5rem 1.5rem;
+                            font-weight: 500;
+                            box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3);
+                            transition: all 0.3s ease;
+                        " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(102, 126, 234, 0.4)';" 
+                           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(102, 126, 234, 0.3)';">
                             {% if is_editing %}
                                 <i class="fas fa-save me-2"></i>Update Entry
                             {% else %}
@@ -257,40 +238,59 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Form validation script loaded');
+    // Track if form has been modified
+    let formModified = false;
+    let formSubmitted = false;
     
     // Form validation feedback
     const form = document.querySelector('form');
     const submitButton = document.querySelector('button[type="submit"]');
     
-    console.log('Form found:', form);
-    console.log('Submit button found:', submitButton);
-    
     if (form && submitButton) {
+        // Store original form values
+        const originalValues = new FormData(form);
+        
+        // Track changes to any form field
+        const formFields = form.querySelectorAll('input, textarea, select');
+        formFields.forEach(field => {
+            field.addEventListener('input', function() {
+                formModified = true;
+            });
+            field.addEventListener('change', function() {
+                formModified = true;
+            });
+        });
+        
+        // Warn before leaving page if form modified and not submitted
+        // This uses the browser's built-in beforeunload event which works for all navigation
+        window.addEventListener('beforeunload', function(e) {
+            if (formModified && !formSubmitted) {
+                e.preventDefault();
+                e.returnValue = ''; // Required for Chrome
+                return 'You have unsaved changes. Are you sure you want to leave?';
+            }
+        });
+        
         form.addEventListener('submit', function(e) {
-            console.log('Form submit triggered');
+            // Mark as submitted so we don't show warning
+            formSubmitted = true;
             
-            // Get form values - use safer approach
+            // Get form values
             const titleField = document.querySelector('input[name="title"]');
             const contentField = document.querySelector('textarea[name="content"]');
             const gratitudeField = document.querySelector('textarea[name="gratitude_text"]');
             const moodField = document.querySelector('select[name="mood_rating"]');
-            
-            console.log('Title field:', titleField);
-            console.log('Content field:', contentField);
-            console.log('Gratitude field:', gratitudeField);
-            console.log('Mood field:', moodField);
             
             const title = titleField ? titleField.value.trim() : '';
             const content = contentField ? contentField.value.trim() : '';
             const gratitude = gratitudeField ? gratitudeField.value.trim() : '';
             const mood = moodField ? moodField.value : '';
             
-            console.log('Form values:', { title, content, gratitude, mood });
-            
             // Check if form is completely empty
             if (!title && !content && !gratitude && !mood) {
-                console.log('Form is empty, showing warning');
+                // Prevent submission
+                formSubmitted = false;
+                
                 // Let Django handle the validation, but add visual feedback
                 submitButton.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Please add some content!';
                 submitButton.classList.add('btn-warning');
@@ -298,21 +298,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Reset button after 3 seconds
                 setTimeout(() => {
-                    const buttonText = submitButton.textContent.includes('Update') ? 
-                        '<i class="fas fa-save me-2"></i>Update Entry' : 
-                        '<i class="fas fa-save me-2"></i>Save Entry';
-                    submitButton.innerHTML = buttonText;
-                    submitButton.classList.remove('btn-warning');
-                    submitButton.classList.add('btn-primary');
-                }, 3000);
-            } else {
-                console.log('Form has content, submitting');
-                // Form has content, show saving state
-                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
-                submitButton.disabled = true;
-            }
-        });
-    }
-});
-</script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/forms.js' %}"></script>
 {% endblock %}
