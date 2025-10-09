@@ -261,29 +261,108 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     
     window.deleteNote = function(noteId) {
-        if (confirm('Delete this note?')) {
-            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-            if (!csrfToken) return;
-            
-            fetch(`/sticky-notes/${noteId}/delete/`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRFToken': csrfToken,
+        // Create custom delete modal
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: fadeIn 0.2s ease;
+        `;
+        
+        modal.innerHTML = `
+            <style>
+                @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
                 }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const noteElement = document.querySelector(`[data-note-id="${noteId}"]`);
-                    noteElement.style.transition = 'all 0.3s ease-out';
-                    noteElement.style.transform = 'scale(0) rotate(-10deg)';
-                    noteElement.style.opacity = '0';
-                    
-                    setTimeout(() => noteElement.remove(), 300);
+                @keyframes slideUp {
+                    from {
+                        transform: translateY(20px);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateY(0);
+                        opacity: 1;
+                    }
                 }
-            })
-            .catch(error => console.error('Error:', error));
-        }
+            </style>
+            <div style="
+                background: white;
+                border-radius: 12px;
+                padding: 24px;
+                max-width: 400px;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+                animation: slideUp 0.3s ease;
+            ">
+                <h3 style="margin: 0 0 12px 0; color: #333; font-size: 20px;">Delete note?</h3>
+                <p style="margin: 0 0 24px 0; color: #666; line-height: 1.5;">This action cannot be undone.</p>
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button onclick="this.closest('[data-modal]').remove()" style="
+                        padding: 10px 20px;
+                        border: 1px solid #ddd;
+                        background: white;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-size: 14px;
+                        color: #333;
+                        transition: all 0.2s;
+                    " onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='white'">
+                        Cancel
+                    </button>
+                    <button onclick="window.confirmDeleteNote(${noteId})" style="
+                        padding: 10px 20px;
+                        border: none;
+                        background: #dc3545;
+                        color: white;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-size: 14px;
+                        transition: all 0.2s;
+                    " onmouseover="this.style.background='#c82333'" onmouseout="this.style.background='#dc3545'">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        modal.setAttribute('data-modal', 'true');
+        document.body.appendChild(modal);
+    };
+    
+    window.confirmDeleteNote = function(noteId) {
+        // Remove modal
+        document.querySelector('[data-modal]')?.remove();
+        
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+        if (!csrfToken) return;
+        
+        // Proceed with deletion
+        fetch(`/sticky-notes/${noteId}/delete/`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': csrfToken,
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const noteElement = document.querySelector(`[data-note-id="${noteId}"]`);
+                noteElement.style.transition = 'all 0.3s ease-out';
+                noteElement.style.transform = 'scale(0) rotate(-10deg)';
+                noteElement.style.opacity = '0';
+                
+                setTimeout(() => noteElement.remove(), 300);
+            }
+        })
+        .catch(error => console.error('Error:', error));
     };
     
     function showCelebration(message) {
