@@ -680,17 +680,14 @@
             <div style="
                 display: flex;
                 justify-content: space-between;
-                align-items: flex-start;
-                margin-bottom: 10px;
-                padding-bottom: 8px;
-                padding-top: 22px;
+                align-items: center;
+                margin-bottom: 5px;
+                padding-bottom: 5px;
+                padding-top: 8px;
                 border-bottom: 2px solid #f8f9fa;
             ">
-                <div>
-                    <h3 style="margin: 0; font-size: 1.4rem; color: #2c3e50; font-weight: 600;">{{ day.day_name }}</h3>
-                    <div style="font-size: 0.9rem; color: #6c757d; margin-top: 5px;">{{ day.date|date:'M j, Y' }}</div>
-                </div>
-                <div style="font-size: 2.5rem; font-weight: bold; color: #667eea; opacity: 0.3;">{{ day.day_number }}</div>
+                <h3 style="margin: 0; font-size: 1.4rem; color: #2c3e50; font-weight: 600;">{{ day.day_name }}</h3>
+                <div style="font-size: 1.1rem; font-weight: 600; color: #667eea; opacity: 0.7;">{{ day.date|date:'jS M' }}</div>
             </div>
             
             <!-- Day Content -->
