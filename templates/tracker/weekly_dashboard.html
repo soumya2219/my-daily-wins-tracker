@@ -666,7 +666,7 @@
             "></div>
             
             <!-- Status Indicator - At the very top -->
-            <div style="position: absolute; top: 6px; right: 15px; z-index: 10;">
+            <div style="position: absolute; top: 6px; left: 50%; transform: translateX(-50%); z-index: 10;">
                 {% if day.is_today %}
                     <span style="background: #28a745; color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 500;">Today</span>
                 {% elif day.is_past %}
