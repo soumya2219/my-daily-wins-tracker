@@ -121,15 +121,14 @@ TEMPLATES = [
 # -------------------------
 # Database Configuration
 # -------------------------
-# Hybrid setup: PostgreSQL for production (Heroku), SQLite for development
+# Hybrid setup: PostgreSQL for production/remote, SQLite for local development
 DATABASE_URL = os.environ.get("DATABASE_URL")
 if DATABASE_URL:
-    # Production: Use PostgreSQL via Heroku DATABASE_URL
+    # Use PostgreSQL (Heroku, Neon, or other providers)
     DATABASES = {
         "default": dj_database_url.parse(
             DATABASE_URL,
             conn_max_age=600,      # Connection pooling for performance
-            ssl_require=True,      # Required for Heroku Postgres
         )
     }
 else:
