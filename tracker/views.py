@@ -244,11 +244,13 @@ def entry_detail_modal(request, entry_date):
     
     # Return HTML for the modal
     from django.template.loader import render_to_string
+    # Check if this is a new entry (no content yet) or an existing one being edited
+    is_new_entry = not entry.has_content
     modal_html = render_to_string('tracker/entry_modal.html', {
         'form': form,
         'entry': entry,
         'entry_date': target_date,
-        'created': created,
+        'is_new_entry': is_new_entry,
     }, request=request)
     
     return JsonResponse({
