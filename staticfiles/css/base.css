@@ -215,7 +215,7 @@ footer {
 
 footer .rainbow-border {
     position: absolute;
-    top: 0;
+    top: -1px;
     left: 0;
     right: 0;
     height: 6px;
