@@ -26,7 +26,7 @@ class EntryForm(forms.ModelForm):
             }),
             'content': forms.Textarea(attrs={
                 'class': 'form-control',
-                'placeholder': 'List your wins (one per line):\nCompleted project milestone\nHad a great conversation with a friend\nLearned something new\nMade healthy choices\nHelped someone out',
+                'placeholder': 'List your wins:\n• Completed a task\n• Learned something new\n• Made a healthy choice',
                 'rows': 5
             }),
             'mood_rating': forms.Select(attrs={

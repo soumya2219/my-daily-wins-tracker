@@ -67,6 +67,20 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     border-radius: 15px;
 }
 
+/* Lighter placeholder text for better readability */
+::placeholder {
+    color: #adb5bd !important;
+    opacity: 1;
+}
+
+:-ms-input-placeholder {
+    color: #adb5bd !important;
+}
+
+::-ms-input-placeholder {
+    color: #adb5bd !important;
+}
+
 /* Beautiful navbar styling to match the cards */
 .custom-navbar {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
