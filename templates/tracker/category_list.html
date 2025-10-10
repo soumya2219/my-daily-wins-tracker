@@ -119,25 +119,25 @@
 <div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-labelledby="deleteCategoryModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
+            <div class="modal-header text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                 <h5 class="modal-title" id="deleteCategoryModalLabel">
-                    <i class="fas fa-exclamation-triangle me-2"></i>Delete Category
+                    <i class="fas fa-question-circle me-2"></i>Delete Category?
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p class="mb-3">Are you sure you want to delete the category <strong id="categoryNameToDelete"></strong>?</p>
-                <div class="alert alert-warning">
-                    <i class="fas fa-info-circle me-2"></i>
-                    <strong>Warning:</strong> This action cannot be undone. The category will be removed from all associated entries.
+                <p class="mb-3">Are you sure you want to delete <strong id="categoryNameToDelete"></strong>?</p>
+                <div class="alert alert-light border">
+                    <i class="fas fa-info-circle me-2 text-primary"></i>
+                    This will remove the category from all your entries.
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times me-2"></i>Cancel
                 </button>
-                <a href="#" id="confirmDeleteBtn" class="btn btn-danger">
-                    <i class="fas fa-trash me-2"></i>Delete Category
+                <a href="#" id="confirmDeleteBtn" class="btn btn-outline-danger">
+                    <i class="fas fa-trash me-2"></i>Yes, Delete It
                 </a>
             </div>
         </div>
