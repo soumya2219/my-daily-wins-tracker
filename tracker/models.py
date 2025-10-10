@@ -38,6 +38,8 @@ class Category(models.Model):
         verbose_name_plural = "Categories"
         ordering = ['name']
         constraints = [
+            # Prevent duplicate category names per user (case-insensitive)
+            # Using Lower() so "work" and "Work" are treated as the same
             UniqueConstraint(
                 Lower('name'), 'user',
                 name='unique_category_name_per_user',
@@ -117,18 +119,20 @@ class Entry(models.Model):
         ordering = ['-entry_date', '-date_created']
         constraints = [
             # Business rule: one entry per user per day to maintain daily habit
+            # Enforced at DB level so we can't accidentally create duplicates
             UniqueConstraint(
                 fields=['user', 'entry_date'],
                 name='unique_entry_per_user_per_day',
                 violation_error_message='You can only have one entry per day.'
             ),
+            # Validate mood rating is in the 1-10 range (or None)
             models.CheckConstraint(
                 name='mood_rating_valid_choice',
                 check=models.Q(mood_rating__isnull=True) | models.Q(mood_rating__in=[1,2,3,4,5,6,7,8,9,10]),
                 violation_error_message='Mood rating must be between 1 and 10.',
             )
         ]
-        # DB indexes for performance
+        # DB indexes for performance on common queries
         indexes = [
             models.Index(fields=['user', '-entry_date']),  # Dashboard queries
             models.Index(fields=['user', 'entry_date']),   # Day lookups
@@ -149,6 +153,8 @@ class Entry(models.Model):
     @property
     def has_content(self):
         """Check if entry has any content for calendar display"""
+        # Using bool() and 'or' to check if ANY field has something
+        # Empty strings/None are falsy, so this returns True only if something exists
         return bool(self.title or self.content or self.gratitude_text or self.mood_rating)
 
 
@@ -157,9 +163,11 @@ class Entry(models.Model):
 def ensure_same_user_for_categories(sender, instance, action, reverse, model, pk_set, **kwargs):
     """
     Data integrity check - make sure users can only assign their own categories.
+    This signal fires when categories are added/set on an entry.
     """
     if action in {'pre_add', 'pre_set'} and pk_set:
         # Verify all categories belong to entry owner
+        # If someone tries to assign a category they don't own, block it
         categories = Category.objects.filter(pk__in=pk_set).values_list('user_id', flat=True).distinct()
         if categories.count() > 1 or (categories and categories.first() != instance.user_id):
             raise ValidationError("You can only assign your own categories to your entries.")
@@ -191,6 +199,7 @@ class StickyNote(models.Model):
         from datetime import date
         
         # Get or create today's entry
+        # get_or_create is perfect - returns (entry, created) tuple
         entry, created = Entry.objects.get_or_create(
             user=self.user,
             entry_date=date.today(),
@@ -201,6 +210,7 @@ class StickyNote(models.Model):
         completed_text = f"✓ {self.content}"
         
         # Add the sticky note content to the daily wins (content field)
+        # Need to handle both empty and existing content scenarios
         if entry.content:
             # If there's already content, add this on a new line
             entry.content += f"\n{completed_text}"
@@ -211,6 +221,7 @@ class StickyNote(models.Model):
         entry.save()
         
         # Try to assign to "Quick Wins" category if it exists
+        # Using iexact for case-insensitive matching
         try:
             quick_wins_category = Category.objects.get(user=self.user, name__iexact="Quick Wins")
             entry.categories.add(quick_wins_category)
