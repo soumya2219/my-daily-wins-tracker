@@ -185,36 +185,30 @@
                 }
                 
                 // Handle clicking on any day (with or without entry)
+                // hasEntry tells us if the day already has content
                 function handleDayClick(date, hasEntry) {
-                    console.log('Day clicked:', date, 'Has entry:', hasEntry);
-                    
                     if (hasEntry) {
-                        // Navigate to the view/edit page for existing entry
+                        // Day has an entry - need to fetch it and go to edit page
+                        // Using AJAX first to get the entry ID
                         fetch(`/get-day-entry/?date=${date}`)
-                            .then(response => {
-                                console.log('Response status:', response.status);
-                                return response.json();
-                            })
+                            .then(response => response.json())
                             .then(data => {
-                                console.log('Entry data:', data);
                                 if (data.entry && data.entry.id) {
-                                    // Redirect to the entry edit page
-                                    console.log('Redirecting to edit page:', data.entry.id);
+                                    // Got the entry, redirect to edit page
                                     window.location.href = `/entries/${data.entry.id}/edit/`;
                                 } else {
-                                    // If no entry found, try to create one
-                                    console.log('No entry found, redirecting to create');
+                                    // Weird case - hasEntry was true but no entry found
                                     window.location.href = `/entries/new/?date=${date}`;
                                 }
                             })
                             .catch(error => {
                                 console.error('Error fetching entry:', error);
-                                // Fallback: try to create new entry
+                                // If fetch fails, fallback to create new entry
                                 window.location.href = `/entries/new/?date=${date}`;
                             });
                     } else {
-                        // Navigate to create new entry with pre-filled date
-                        console.log('Creating new entry for date:', date);
+                        // No entry for this day yet - go straight to create page
+                        // Date gets pre-filled in the form via URL parameter
                         window.location.href = `/entries/new/?date=${date}`;
                     }
                 }
@@ -244,18 +238,21 @@
                 }
                 
                 function createStickyNote(content, element) {
+                    // Send POST request to save the sticky note in the database
+                    // Need to include CSRF token for Django security
                     fetch('/sticky-notes/create/', {
                         method: 'POST',
                         headers: {
                             'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
                             'Content-Type': 'application/x-www-form-urlencoded',
                         },
-                        body: `content=${encodeURIComponent(content)}`
+                        body: `content=${encodeURIComponent(content)}`  // URL encode to handle special characters
                     })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            // Replace the placeholder with real note
+                            // Replace the placeholder div with actual note HTML
+                            // Now it has a real ID from database and action buttons
                             const noteElement = element.closest('.sticky-note');
                             noteElement.setAttribute('data-note-id', data.note.id);
                             noteElement.innerHTML = `
@@ -290,7 +287,7 @@
                     const container = document.getElementById('sticky-notes-container');
                     const addBtn = document.getElementById('add-note-btn');
                     
-                    // Check if we already have 6 notes (max limit)
+                    // Limit to 6 notes for UI purposes - keeps the sidebar from getting too crowded
                     const existingNotes = container.querySelectorAll('.sticky-note').length;
                     if (existingNotes >= 6) {
                         alert('Maximum 6 notes allowed. Complete or delete some notes to add more!');
@@ -327,23 +324,29 @@
                 }
                 
                 function setupNoteEditing(noteElement) {
+                    // Make sticky notes editable using contenteditable
+                    // When they click away (blur) or press Enter, save the changes
                     const contentDiv = noteElement.querySelector('.sticky-note-content');
                     const noteId = noteElement.getAttribute('data-note-id');
                     
                     contentDiv.addEventListener('blur', function() {
+                        // User clicked away - save their changes
                         const content = this.textContent.trim();
                         updateStickyNote(noteId, content);
                     });
                     
                     contentDiv.addEventListener('keydown', function(e) {
                         if (e.key === 'Enter') {
+                            // Pressing Enter saves and stops editing
                             e.preventDefault();
-                            this.blur();
+                            this.blur(); // Triggers the blur event above
                         }
                     });
                 }
                 
                 function updateStickyNote(noteId, content) {
+                    // POST request to save edited note content
+                    // If user deletes all text, the note gets removed from database
                     fetch(`/sticky-notes/${noteId}/update/`, {
                         method: 'POST',
                         headers: {
@@ -356,6 +359,7 @@
                     .then(data => {
                         if (data.success && data.deleted) {
                             // Note was deleted because content was empty
+                            // Remove it from the page
                             document.querySelector(`[data-note-id="${noteId}"]`).remove();
                         }
                     })
@@ -363,9 +367,8 @@
                 }
                 
                 function completeNote(noteId) {
-                    console.log('completeNote called with noteId:', noteId);
                     if (confirm('Mark this note as completed and add it to today\'s wins?')) {
-                        console.log('User confirmed, sending request...');
+                        // Convert the sticky note to a daily win entry
                         fetch(`/sticky-notes/${noteId}/complete/`, {
                             method: 'POST',
                             headers: {
@@ -374,14 +377,14 @@
                         })
                         .then(response => response.json())
                         .then(data => {
-                            console.log('Sticky note completed:', data);
                             if (data.success) {
-                                // Celebration animation
+                                // Fun visual feedback for completing a task
                                 const noteElement = document.querySelector(`[data-note-id="${noteId}"]`);
                                 noteElement.style.transform = 'scale(1.2) rotate(0deg)';
                                 noteElement.style.background = '#4caf50';
                                 noteElement.style.color = 'white';
                                 
+                                // Multi-stage animation: grow -> spin away
                                 setTimeout(() => {
                                     noteElement.style.transition = 'all 0.5s ease-out';
                                     noteElement.style.transform = 'scale(0) rotate(180deg)';
@@ -390,7 +393,7 @@
                                     setTimeout(() => {
                                         noteElement.remove();
                                         showCelebration(`🎉 "${data.entry.title}" added to your wins!`);
-                                        // Reload page after celebration to update day card styling
+                                        // Reload to update the today card (shows it has content now)
                                         setTimeout(() => {
                                             location.reload();
                                         }, 1000);
@@ -403,7 +406,9 @@
                 }
                 
                 function deleteNote(noteId) {
-                    // Create custom delete modal
+                    // Create custom delete modal instead of browser's confirm()
+                    // Looks nicer and matches the site's design better
+                    // Built with inline styles so we don't need a separate CSS file
                     const modal = document.createElement('div');
                     modal.style.cssText = `
                         position: fixed;
@@ -464,10 +469,11 @@
                 }
                 
                 function confirmDeleteNote(noteId) {
-                    // Remove modal
+                    // Remove modal first for instant feedback
                     document.querySelector('[data-modal]').remove();
                     
-                    // Proceed with deletion
+                    // DELETE request to actually remove the note from the database
+                    // Using Fetch API like all our other AJAX requests
                     fetch(`/sticky-notes/${noteId}/delete/`, {
                         method: 'DELETE',
                         headers: {
@@ -477,11 +483,14 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
+                            // Animate the note shrinking and spinning away
+                            // More satisfying than just removing it instantly
                             const noteElement = document.querySelector(`[data-note-id="${noteId}"]`);
                             noteElement.style.transition = 'all 0.3s ease-out';
                             noteElement.style.transform = 'scale(0) rotate(-10deg)';
                             noteElement.style.opacity = '0';
                             
+                            // Wait for animation before removing from DOM
                             setTimeout(() => noteElement.remove(), 300);
                         }
                     })
@@ -489,6 +498,9 @@
                 }
                 
                 function showCelebration(message) {
+                    // Shows a temporary message in the middle of the screen
+                    // Used when completing sticky notes or other achievements
+                    // Auto-disappears after 3 seconds
                     const celebration = document.createElement('div');
                     celebration.style.cssText = `
                         position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -500,22 +512,23 @@
                     celebration.textContent = message;
                     document.body.appendChild(celebration);
                     
+                    // Remove after 3 seconds
                     setTimeout(() => celebration.remove(), 3000);
                 }
                 
                 // Helper function to attach event listeners to buttons
+                // Called after adding new notes to make the buttons work
+                // Using event.stopPropagation() to prevent clicks bubbling up to the note itself
                 function attachButtonListeners(container) {
                     const completeBtn = container.querySelector('.complete-btn');
                     const deleteBtn = container.querySelector('.delete-btn');
                     
                     if (completeBtn) {
-                        console.log('Attaching listener to complete button');
                         completeBtn.addEventListener('click', function(e) {
-                            e.preventDefault();
-                            e.stopPropagation();
+                            e.preventDefault(); // Don't submit any forms
+                            e.stopPropagation(); // Don't trigger note's click handler
                             const noteElement = this.closest('.sticky-note');
                             const noteId = noteElement.getAttribute('data-note-id');
-                            console.log('Complete button clicked for note:', noteId);
                             completeNote(noteId);
                         });
                     }
@@ -532,16 +545,14 @@
                 }
                 
                 // Initialize existing note editing
+                // Runs when page loads to set up all the sticky notes that already exist
+                // Skips the "new" placeholder note (it doesn't exist in database yet)
                 document.addEventListener('DOMContentLoaded', function() {
-                    console.log('DOM loaded, initializing sticky notes...');
                     const notes = document.querySelectorAll('.sticky-note[data-note-id]:not([data-note-id="new"])');
-                    console.log('Found', notes.length, 'existing sticky notes');
                     notes.forEach(function(note) {
                         const noteId = note.getAttribute('data-note-id');
-                        console.log('Processing note:', noteId);
-                        setupNoteEditing(note);
-                        attachButtonListeners(note);
-                        console.log('Initialized note:', noteId);
+                        setupNoteEditing(note); // Make the text editable
+                        attachButtonListeners(note); // Hook up complete/delete buttons
                     });
                 });
             </script>
@@ -1009,11 +1020,9 @@ function loadUserCategories() {
 }
 
 function displayCategories(categories) {
-    console.log('📋 Displaying categories:', categories);
     const categoryList = document.getElementById('category-list');
     
     if (!categoryList) {
-        console.error('❌ Category list element not found');
         return;
     }
     
@@ -1050,15 +1059,16 @@ function displayCategories(categories) {
     html += '</div>';
     
     categoryList.innerHTML = html;
-    console.log('✅ Categories displayed successfully');
 }
 
 // Category deletion with confirmation
+// Deleting a category doesn't delete the entries - they just lose that tag
 function deleteCategory(categoryId) {
     if (!confirm('Are you sure you want to delete this category?')) {
         return;
     }
     
+    // DELETE request to remove the category from the database
     fetch(`/categories/${categoryId}/ajax/delete/`, {
         method: 'DELETE',
         headers: {
@@ -1069,6 +1079,7 @@ function deleteCategory(categoryId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
+            // Refresh the category list to show it's gone
             loadUserCategories();
             alert('Category deleted successfully!');
         } else {
@@ -1082,14 +1093,13 @@ function deleteCategory(categoryId) {
 }
 
 // Create new category via AJAX
+// Categories help organize entries (work, exercise, personal, etc.)
 function createCategory() {
-    console.log('🎨 Creating new category...');
     const nameInput = document.getElementById('categoryName');
     const colorInput = document.getElementById('categoryColor');
     
-    // Validate form inputs exist
+    // Validate form inputs exist (safety check for DOM)
     if (!nameInput || !colorInput) {
-        console.error('❌ Category form inputs not found');
         alert('Category form inputs not found');
         return;
     }
@@ -1097,8 +1107,7 @@ function createCategory() {
     const name = nameInput.value.trim();
     const color = colorInput.value;
     
-    console.log('📝 Category data:', { name, color });
-    
+    // Basic validation - name is required
     if (!name) {
         alert('Please enter a category name');
         nameInput.focus();
@@ -1112,19 +1121,13 @@ function createCategory() {
     formData.append('description', ''); // Empty description since it's optional
     formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
     
-    console.log('🚀 Sending create request...');
-    
     // Submit to server
     fetch('/categories/ajax/create/', {
         method: 'POST',
         body: formData
     })
-    .then(response => {
-        console.log('📡 Response status:', response.status);
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
-        console.log('📦 Response data:', data);
         if (data.success) {
             // Clear form and reload categories
             nameInput.value = '';
@@ -1133,46 +1136,38 @@ function createCategory() {
             toggleCategoryForm();
             alert('Category created successfully!');
         } else {
-            console.error('❌ Server error:', data);
             alert('Error creating category: ' + (data.error || JSON.stringify(data.errors)));
         }
     })
     .catch(error => {
-        console.error('❌ Network error:', error);
         alert('Error creating category: ' + error.message);
     });
 }
 
 function toggleCategoryForm() {
-    console.log('🎯 toggleCategoryForm() called!');
+    // Show/hide the quick category creation form
+    // Changes button text between "Add New Category" and "Cancel"
     const form = document.getElementById('quickCategoryForm');
     const button = document.querySelector('[onclick="toggleCategoryForm()"]');
-    
-    console.log('Form element:', form);
-    console.log('Button element:', button);
     
     if (form && button) {
         const isFormVisible = form.style.display !== 'none' && form.style.display !== '';
         
         if (isFormVisible) {
+            // Hide the form
             form.style.display = 'none';
             button.innerHTML = '<i class="fas fa-plus me-2"></i>Add New Category';
-            console.log('✅ Form hidden');
         } else {
+            // Show the form
             form.style.display = 'block';
             button.innerHTML = '<i class="fas fa-minus me-2"></i>Cancel';
-            console.log('✅ Form shown');
             
-            // Focus on the name input when showing the form
+            // Auto-focus on the name input for better UX
             const nameInput = document.getElementById('categoryName');
             if (nameInput) {
                 setTimeout(() => nameInput.focus(), 100);
             }
         }
-    } else {
-        console.error('❌ Form or button not found');
-        console.log('Available elements with onclick="toggleCategoryForm()":');
-        console.log(document.querySelectorAll('[onclick="toggleCategoryForm()"]'));
     }
 }
 
@@ -1233,17 +1228,17 @@ function refreshCategoriesInMainForm() {
 }
 
 // Edit category functionality
+// Need to fetch current data first to pre-fill the form
 function editCategory(categoryId) {
-    console.log('✏️ Editing category:', categoryId);
-    
     // First, fetch the current category data
     fetch('/categories/ajax/list/')
     .then(response => response.json())
     .then(data => {
         if (data.success) {
+            // Find the specific category in the list
             const category = data.categories.find(cat => cat.id === categoryId);
             if (category) {
-                // Populate the edit form
+                // Show a form pre-filled with current name/color
                 showEditCategoryForm(category);
             } else {
                 alert('Category not found');
@@ -1341,8 +1336,6 @@ function saveEditCategory() {
         return;
     }
     
-    console.log('💾 Saving category changes:', { id: categoryId, name, color });
-    
     const formData = new FormData();
     formData.append('name', name);
     formData.append('color', color);
@@ -1355,18 +1348,15 @@ function saveEditCategory() {
     })
     .then(response => {
         if (response.ok) {
-            console.log('✅ Category updated successfully');
             // Hide edit form and reload categories
             cancelEditCategory();
             loadUserCategories();
             alert('Category updated successfully!');
         } else {
-            console.error('❌ Error updating category, status:', response.status);
             alert('Error updating category. Please try again.');
         }
     })
     .catch(error => {
-        console.error('❌ Network error updating category:', error);
         alert('Error updating category. Please check your connection and try again.');
     });
 }
@@ -1377,8 +1367,6 @@ function deleteEntry(entryId) {
         return;
     }
     
-    console.log('🗑️ Deleting entry:', entryId);
-    
     fetch(`/entries/${entryId}/delete/`, {
         method: 'POST',
         headers: {
@@ -1388,16 +1376,13 @@ function deleteEntry(entryId) {
     })
     .then(response => {
         if (response.ok) {
-            console.log('✅ Entry deleted successfully');
             // Refresh the page to show updated content
             location.reload();
         } else {
-            console.error('❌ Error deleting entry, status:', response.status);
             alert('Error deleting entry. Please try again.');
         }
     })
     .catch(error => {
-        console.error('❌ Network error deleting entry:', error);
         alert('Error deleting entry. Please check your connection and try again.');
     });
 }
