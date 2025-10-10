@@ -237,3 +237,90 @@ footer p.sub {
     opacity: 0.8;
     font-size: 0.9rem;
 }
+
+/* Custom Button Styling - Purple gradient theme throughout the app */
+.btn-cute {
+    border-radius: 30px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 12px 30px;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    border: none;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Primary button (Success/Green classes) - Purple gradient */
+.btn-cute.btn-success {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+}
+
+.btn-cute.btn-success:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    color: white;
+}
+
+/* Primary button (Bootstrap primary) - Purple gradient for login pages */
+.btn-cute.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+}
+
+.btn-cute.btn-primary:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    color: white;
+}
+
+/* Secondary button (Outline styles) - Subtle outline with gradient hover */
+.btn-cute.btn-outline-primary {
+    background: white;
+    border: 2px solid #667eea;
+    color: #667eea;
+}
+
+.btn-cute.btn-outline-primary:hover {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border-color: #764ba2;
+    color: #764ba2;
+}
+
+.btn-cute.btn-outline-secondary {
+    background: white;
+    border: 2px solid #667eea;
+    color: #667eea;
+}
+
+.btn-cute.btn-outline-secondary:hover {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border-color: #764ba2;
+    color: #764ba2;
+}
+
+/* Ripple effect on click */
+.btn-cute::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    transition: all 0.6s ease;
+    transform: translate(-50%, -50%);
+}
+
+.btn-cute:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* Lift effect on hover */
+.btn-cute:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+}
