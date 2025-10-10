@@ -31,24 +31,12 @@
                                     <span class="badge me-2" style="background-color: {{ category.color }}; width: 20px; height: 20px;">&nbsp;</span>
                                     <h5 class="mb-0">{{ category.name }}</h5>
                                 </div>
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" 
-                                            data-bs-toggle="dropdown" aria-expanded="false">
-                                        ⚙️
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <li>
-                                            <a class="dropdown-item" href="{% url 'category_edit' category.pk %}">
-                                                ✏️ Edit
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item text-danger" href="{% url 'category_delete' category.pk %}">
-                                                🗑️ Delete
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
+                                <a href="{% url 'category_delete' category.pk %}" 
+                                   class="btn btn-sm btn-outline-danger" 
+                                   title="Delete category"
+                                   onclick="return confirm('Are you sure you want to delete this category? This action cannot be undone.');">
+                                    🗑️
+                                </a>
                             </div>
                             <div class="card-body">
                                 {% if category.description %}
