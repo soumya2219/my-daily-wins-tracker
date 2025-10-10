@@ -99,24 +99,25 @@ class EntryForm(forms.ModelForm):
         if title_empty and content_empty and gratitude_empty and mood_empty:
             raise ValidationError(
                 "🤔 Your entry seems to be empty! Please add at least one of the following: "
-                "a title, your wins/achievements, a gratitude note, or select your mood."
+                "a highlight, your wins/achievements, a gratitude note, or select your mood."
             )
+        
+        # Collect all validation errors together to avoid duplicates
+        errors = {}
         
         # Validate meaningful content length (only if something was entered)
         if title and len(title.strip()) < 3:
-            raise ValidationError({
-                'title': 'Title should be at least 3 characters long.'
-            })
+            errors['title'] = 'Highlight should be at least 3 characters long.'
         
         if content and len(content.strip()) < 5:
-            raise ValidationError({
-                'content': 'Please write at least 5 characters about your wins.'
-            })
+            errors['content'] = 'Please write at least 5 characters about your wins.'
         
         if gratitude_text and len(gratitude_text.strip()) < 5:
-            raise ValidationError({
-                'gratitude_text': 'Please write at least 5 characters about what you\'re grateful for.'
-            })
+            errors['gratitude_text'] = 'Please write at least 5 characters about what you\'re grateful for.'
+        
+        # Raise all errors at once if any exist
+        if errors:
+            raise ValidationError(errors)
         
         return cleaned_data
 

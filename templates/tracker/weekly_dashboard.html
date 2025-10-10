@@ -817,20 +817,30 @@ function initializeModalForm(date) {
     // Initialize manage categories button
     const manageCategoriesBtn = document.getElementById('manageCategoriesBtn');
     if (manageCategoriesBtn) {
-        manageCategoriesBtn.addEventListener('click', function() {
+        // Remove any existing event listener by cloning and replacing
+        const newManageCategoriesBtn = manageCategoriesBtn.cloneNode(true);
+        manageCategoriesBtn.parentNode.replaceChild(newManageCategoriesBtn, manageCategoriesBtn);
+        
+        newManageCategoriesBtn.addEventListener('click', function() {
             openCategoryManager();
         });
     }
     
-    form.addEventListener('submit', function(e) {
+    // Remove any existing submit event listeners by cloning the form
+    // This prevents duplicate submissions when modal is opened multiple times
+    const newForm = form.cloneNode(true);
+    form.parentNode.replaceChild(newForm, form);
+    const formToUse = document.getElementById('entry-form');
+    
+    formToUse.addEventListener('submit', function(e) {
         e.preventDefault(); // AJAX form submission
         
         // Check form values before submitting
-        const titleField = form.querySelector('input[name="title"]');
-        const contentField = form.querySelector('textarea[name="content"]');
-        const gratitudeField = form.querySelector('textarea[name="gratitude_text"]');
-        const moodField = form.querySelector('select[name="mood_rating"]');
-        const submitButton = form.querySelector('button[type="submit"]');
+        const titleField = formToUse.querySelector('input[name="title"]');
+        const contentField = formToUse.querySelector('textarea[name="content"]');
+        const gratitudeField = formToUse.querySelector('textarea[name="gratitude_text"]');
+        const moodField = formToUse.querySelector('select[name="mood_rating"]');
+        const submitButton = formToUse.querySelector('button[type="submit"]');
         
         const title = titleField ? titleField.value.trim() : '';
         const content = contentField ? contentField.value.trim() : '';
@@ -855,7 +865,7 @@ function initializeModalForm(date) {
             }
             
             // Also show an alert in the modal
-            const existingAlert = form.querySelector('.alert');
+            const existingAlert = formToUse.querySelector('.alert');
             if (existingAlert) {
                 existingAlert.remove();
             }
@@ -865,7 +875,7 @@ function initializeModalForm(date) {
             alertDiv.innerHTML = `
                 <i class="fas fa-exclamation-triangle me-2"></i>
                 <strong>🤔 Your entry seems to be empty!</strong> Please add at least one of the following: 
-                a title, your wins/achievements, a gratitude note, or select your mood.
+                a highlight, your wins/achievements, a gratitude note, or select your mood.
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             `;
             
@@ -884,7 +894,7 @@ function initializeModalForm(date) {
             submitButton.disabled = true;
         }
         
-        const formData = new FormData(form);
+        const formData = new FormData(formToUse);
         
         fetch('/entry/' + date + '/', {
             method: 'POST',
@@ -904,7 +914,7 @@ function initializeModalForm(date) {
                 console.error('Form errors:', data.errors);
                 
                 // Remove existing alerts
-                const existingAlert = form.querySelector('.alert');
+                const existingAlert = formToUse.querySelector('.alert');
                 if (existingAlert) {
                     existingAlert.remove();
                 }
@@ -913,14 +923,30 @@ function initializeModalForm(date) {
                 const alertDiv = document.createElement('div');
                 alertDiv.className = 'alert alert-warning alert-dismissible fade show mt-3';
                 
+                // Map field names to user-friendly labels
+                const fieldLabels = {
+                    'title': 'Highlight',
+                    'content': 'Daily Wins',
+                    'gratitude_text': 'Gratitude',
+                    'mood_rating': 'Mood',
+                    'entry_date': 'Date',
+                    'categories': 'Categories'
+                };
+                
                 let errorHTML = '<i class="fas fa-exclamation-triangle me-2"></i><strong>Please fix the following:</strong><ul class="mb-0 mt-2">';
                 
                 for (const [field, errors] of Object.entries(data.errors)) {
-                    for (const error of errors) {
+                    // Handle array of errors for each field
+                    const errorList = Array.isArray(errors) ? errors : [errors];
+                    
+                    for (const error of errorList) {
                         if (field === '__all__') {
+                            // General form errors without a specific field
                             errorHTML += `<li>${error}</li>`;
                         } else {
-                            errorHTML += `<li><strong>${field.charAt(0).toUpperCase() + field.slice(1)}:</strong> ${error}</li>`;
+                            // Use friendly label if available, otherwise capitalize field name
+                            const fieldLabel = fieldLabels[field] || field.charAt(0).toUpperCase() + field.slice(1).replace(/_/g, ' ');
+                            errorHTML += `<li><strong>${fieldLabel}:</strong> ${error}</li>`;
                         }
                     }
                 }
