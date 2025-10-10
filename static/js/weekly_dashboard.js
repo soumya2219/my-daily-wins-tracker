@@ -1,42 +1,52 @@
 // Weekly Dashboard JavaScript
+// This file handles calendar navigation and sticky note interactions
 document.addEventListener('DOMContentLoaded', function() {
-    // Apply responsive class
+    // Apply responsive class for better mobile layout
     const gridElement = document.querySelector('[style*="grid-template-columns: auto 1fr auto"]');
     if (gridElement) {
         gridElement.classList.add('grid-layout-compact');
     }
     
+    // Track which month/year we're viewing in the calendar
+    // Using optional chaining (?.) in case elements don't exist yet
     let currentMonth = parseInt(document.querySelector('#calendar-month')?.dataset?.month || new Date().getMonth());
     let currentYear = parseInt(document.querySelector('#calendar-month')?.dataset?.year || new Date().getFullYear());
     
-    // Month navigation
+    // Month navigation for the mini calendar
+    // Direction is +1 or -1 for next/prev month
     window.changeMonth = function(direction) {
         currentMonth += direction;
+        // Handle year rollovers
         if (currentMonth > 11) {
-            currentMonth = 0;
+            currentMonth = 0; // January
             currentYear++;
         } else if (currentMonth < 0) {
-            currentMonth = 11;
+            currentMonth = 11; // December
             currentYear--;
         }
         
-        // Update calendar via AJAX
+        // Update calendar via AJAX (no page reload needed)
+        // Adding +1 to month because JavaScript uses 0-11 but Django uses 1-12
         fetch(`/get-calendar-data/?month=${currentMonth + 1}&year=${currentYear}`)
             .then(response => response.json())
             .then(data => {
+                // Replace calendar content with new month
                 document.getElementById('calendar-month').innerHTML = data.month_name;
                 document.getElementById('calendar-grid').innerHTML = data.calendar_html;
             })
             .catch(error => console.error('Error:', error));
     };
     
-    // Show day entry
+    // Show day entry in a modal popup
+    // Called when clicking a day in the calendar that has content
     window.showDayEntry = function(date) {
+        // Fetch the entry data for that specific date
         fetch(`/get-day-entry/?date=${date}`)
             .then(response => response.json())
             .then(data => {
                 if (data.entry) {
                     // Create and show modal with entry details
+                    // Building it with JavaScript for better control over styling
                     const modal = document.createElement('div');
                     modal.style.cssText = `
                         position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -72,7 +82,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     document.body.appendChild(modal);
                     
-                    // Close modal when clicking outside
+                    // Close modal when clicking outside the white box
+                    // e.target === modal means they clicked the dark background, not the content
                     modal.addEventListener('click', (e) => {
                         if (e.target === modal) modal.remove();
                     });
@@ -82,9 +93,11 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     
     // Sticky Notes Functions
+    // Called when user starts typing in the "new" placeholder note
     window.createFirstNote = function(element) {
         element.focus();
         element.addEventListener('blur', function() {
+            // When they click away, save the note if they typed anything
             const content = this.textContent.trim();
             if (content) {
                 createStickyNote(content, this);
@@ -93,8 +106,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         element.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
+                // Pressing Enter saves the note
                 e.preventDefault();
-                this.blur();
+                this.blur(); // Triggers blur event above
             }
         });
     };

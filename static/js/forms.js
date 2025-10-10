@@ -1,19 +1,22 @@
 // Entry Form JavaScript
+// Runs when the page loads - sets up all form enhancements
 document.addEventListener('DOMContentLoaded', function() {
-    // Auto-resize textareas
+    // Auto-resize textareas as the user types
+    // Makes them grow with content instead of showing scrollbars
     const textareas = document.querySelectorAll('textarea');
     textareas.forEach(textarea => {
         textarea.addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = (this.scrollHeight) + 'px';
+            this.style.height = 'auto'; // Reset height first
+            this.style.height = (this.scrollHeight) + 'px'; // Set to content height
         });
         
-        // Initialize height
+        // Initialize height for textareas that already have content
         textarea.style.height = 'auto';
         textarea.style.height = (textarea.scrollHeight) + 'px';
     });
 
     // Color picker for category form
+    // Shows a live preview of the selected color
     const colorInput = document.getElementById('id_color');
     if (colorInput) {
         colorInput.addEventListener('change', function() {
@@ -25,10 +28,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Character counter for text fields
+    // Shows "X/200 characters" below inputs with maxlength
+    // Turns red when getting close to the limit
     const textInputs = document.querySelectorAll('input[type="text"], textarea');
     textInputs.forEach(input => {
         const maxLength = input.getAttribute('maxlength');
         if (maxLength) {
+            // Create a counter div and add it below the input
             const counter = document.createElement('div');
             counter.className = 'text-muted small text-end mt-1';
             counter.id = input.id + '_counter';
@@ -37,15 +43,18 @@ document.addEventListener('DOMContentLoaded', function() {
             function updateCounter() {
                 const remaining = maxLength - input.value.length;
                 counter.textContent = `${input.value.length}/${maxLength} characters`;
+                // Change color to red if less than 20 characters remaining
                 counter.style.color = remaining < 20 ? '#dc3545' : '#6c757d';
             }
             
             input.addEventListener('input', updateCounter);
-            updateCounter();
+            updateCounter(); // Initialize on page load
         }
     });
 
     // Form validation enhancement
+    // Checks required fields before submission
+    // Shows visual feedback (red border for errors, green for valid)
     const forms = document.querySelectorAll('form');
     forms.forEach(form => {
         form.addEventListener('submit', function(e) {
@@ -54,19 +63,21 @@ document.addEventListener('DOMContentLoaded', function() {
             
             requiredFields.forEach(field => {
                 if (!field.value.trim()) {
+                    // Empty required field - mark as invalid
                     field.classList.add('is-invalid');
                     hasErrors = true;
                 } else {
+                    // Field has content - mark as valid
                     field.classList.remove('is-invalid');
                     field.classList.add('is-valid');
                 }
             });
             
             if (hasErrors) {
-                e.preventDefault();
+                e.preventDefault(); // Stop form submission
                 const firstError = form.querySelector('.is-invalid');
                 if (firstError) {
-                    firstError.focus();
+                    firstError.focus(); // Jump to the first error
                 }
             }
         });
@@ -74,16 +85,19 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Entry List JavaScript
+// Sets up search and filter functionality
 function initializeEntryList() {
     // Search functionality
+    // Using a timeout so it doesn't search after every single keystroke
+    // Waits 300ms after user stops typing before filtering
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
         let searchTimeout;
         searchInput.addEventListener('input', function() {
-            clearTimeout(searchTimeout);
+            clearTimeout(searchTimeout); // Cancel previous timeout
             searchTimeout = setTimeout(() => {
                 filterEntries(this.value.toLowerCase());
-            }, 300);
+            }, 300); // Wait 300ms after last keystroke
         });
     }
 
@@ -114,10 +128,13 @@ function initializeEntryList() {
 }
 
 function filterEntries(searchTerm, filterType = '') {
+    // Hide/show entries based on search term and filter type
+    // Searches both title and excerpt content
     const entries = document.querySelectorAll('.entry-card');
     entries.forEach(entry => {
         const title = entry.querySelector('.card-title')?.textContent.toLowerCase() || '';
         const content = entry.querySelector('.entry-excerpt')?.textContent.toLowerCase() || '';
+        // Check if search term appears in title or content
         const matchesSearch = !searchTerm || title.includes(searchTerm) || content.includes(searchTerm);
         
         let matchesFilter = true;
@@ -126,6 +143,7 @@ function filterEntries(searchTerm, filterType = '') {
             matchesFilter = entryType === filterType;
         }
         
+        // Only show entries that match both search AND filter
         entry.style.display = matchesSearch && matchesFilter ? 'block' : 'none';
     });
 }
