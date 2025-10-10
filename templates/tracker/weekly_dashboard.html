@@ -865,10 +865,9 @@ function initializeModalForm(date) {
             }
             
             // Also show an alert in the modal
-            const existingAlert = formToUse.querySelector('.alert');
-            if (existingAlert) {
-                existingAlert.remove();
-            }
+            // Remove ALL existing alerts (not just the first one)
+            const existingAlerts = document.querySelectorAll('#entryModal .alert');
+            existingAlerts.forEach(alert => alert.remove());
             
             const alertDiv = document.createElement('div');
             alertDiv.className = 'alert alert-warning alert-dismissible fade show mt-3';
@@ -913,11 +912,9 @@ function initializeModalForm(date) {
                 // Show form errors
                 console.error('Form errors:', data.errors);
                 
-                // Remove existing alerts
-                const existingAlert = formToUse.querySelector('.alert');
-                if (existingAlert) {
-                    existingAlert.remove();
-                }
+                // Remove ALL existing alerts (not just the first one)
+                const existingAlerts = document.querySelectorAll('#entryModal .alert');
+                existingAlerts.forEach(alert => alert.remove());
                 
                 // Display server-side validation errors
                 const alertDiv = document.createElement('div');
