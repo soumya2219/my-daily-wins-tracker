@@ -208,6 +208,31 @@
     overflow: hidden;
 }
 
+/* Primary button (Get Started) - Purple gradient */
+.btn-cute.btn-success {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+}
+
+.btn-cute.btn-success:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    color: white;
+}
+
+/* Secondary button (I Have an Account) - Subtle outline */
+.btn-cute.btn-outline-primary {
+    background: white;
+    border: 2px solid #667eea;
+    color: #667eea;
+}
+
+.btn-cute.btn-outline-primary:hover {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border-color: #764ba2;
+    color: #764ba2;
+}
+
 .btn-cute::before {
     content: '';
     position: absolute;
