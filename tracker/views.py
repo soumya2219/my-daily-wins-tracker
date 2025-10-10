@@ -1,9 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
-from .validators import validate_username
 from .auth_forms import CustomUserCreationForm
 from django.db.models import Count, Q
 from django.core.paginator import Paginator
@@ -12,6 +11,7 @@ from datetime import date, timedelta, datetime
 import calendar
 import json
 from .models import Entry, Category, StickyNote
+from .forms import EntryForm, QuickEntryForm, CategoryForm
 
 
 def create_default_categories(user):
@@ -40,8 +40,6 @@ def create_default_categories(user):
 
 
 # Authentication Views
-from .forms import EntryForm, QuickEntryForm, CategoryForm
-
 
 def home(request):
     """Landing page - redirect to dashboard if logged in"""
