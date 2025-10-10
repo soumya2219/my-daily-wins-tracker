@@ -123,17 +123,20 @@ def weekly_dashboard(request):
         week_stats['avg_mood'] = round(total_mood / mood_entries.count(), 1)
 
     # Generate calendar for current month
+    # Using Python's calendar library to get proper week layout (with padding days)
     today = date.today()
-    cal = calendar.Calendar(firstweekday=0)  # Monday is first day
+    cal = calendar.Calendar(firstweekday=0)  # Monday is first day (0=Monday, 6=Sunday)
     month_days = cal.monthdayscalendar(today.year, today.month)
     
     # Get all user entries for current month to highlight days with entries
+    # Need to calculate month_end carefully because Dec+1 would be month 13
     month_start = date(today.year, today.month, 1)
     if today.month == 12:
         month_end = date(today.year + 1, 1, 1) - timedelta(days=1)
     else:
         month_end = date(today.year, today.month + 1, 1) - timedelta(days=1)
     
+    # Query entries once, then convert to set for fast lookups
     month_entries = Entry.objects.filter(
         user=request.user,
         entry_date__range=[month_start, month_end]
@@ -141,11 +144,12 @@ def weekly_dashboard(request):
     entry_dates = set(month_entries.values_list('entry_date', flat=True))
     
     # Build calendar data with entry information
+    # monthdayscalendar gives us weeks, with 0 for days from other months
     calendar_weeks = []
     for week in month_days:
         calendar_week = []
         for day in week:
-            if day == 0:
+            if day == 0:  # Day from previous/next month (padding)
                 calendar_week.append({
                     'day': '',
                     'is_today': False,
@@ -196,13 +200,15 @@ def entry_detail_modal(request, entry_date):
     Handles both showing existing entries and creating new ones.
     Uses AJAX so the page doesn't reload.
     """
-    # Make sure the date is valid
+    # Make sure the date is valid (expecting YYYY-MM-DD format from frontend)
     try:
         target_date = datetime.strptime(entry_date, '%Y-%m-%d').date()
     except ValueError:
         return JsonResponse({'error': 'Invalid date format'}, status=400)
     
     # Get the entry for this day, or make a blank one if it doesn't exist
+    # get_or_create is perfect here - avoids checking if exists first
+    # The 'defaults' dict only gets used if creating a new entry
     entry, created = Entry.objects.get_or_create(
         user=request.user,
         entry_date=target_date,
@@ -351,6 +357,8 @@ def entry_list(request):
             pass
     
     # Search functionality
+    # Using Q objects to do OR logic - search across title, content, and gratitude
+    # icontains = case-insensitive contains (better UX than exact match)
     search_query = request.GET.get('search')
     if search_query:
         entries = entries.filter(
@@ -360,6 +368,7 @@ def entry_list(request):
         )
     
     # Order by entry date (newest first - the actual date the entry is for, not when it was created)
+    # distinct() removes duplicates if entry matched multiple categories
     entries = entries.distinct().order_by('-entry_date')
     
     # Pagination

@@ -56,10 +56,12 @@ class EntryForm(forms.ModelForm):
         Also sets today's date automatically for new entries.
         """
         # Get the user from the view so we can filter categories
+        # pop() removes it from kwargs so super().__init__ doesn't get confused
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         
         # Only show categories that belong to this user
+        # Security: don't want users seeing or assigning other people's categories
         if self.user:
             self.fields['categories'].queryset = Category.objects.filter(user=self.user)
         else:
@@ -70,6 +72,7 @@ class EntryForm(forms.ModelForm):
         self.fields['categories'].required = False
         
         # Auto-fill today's date for new entries
+        # Check if this is a new entry (no pk means not saved yet)
         if not self.instance.pk:  # New entry
             from datetime import date
             self.fields['entry_date'].initial = date.today()
@@ -86,6 +89,7 @@ class EntryForm(forms.ModelForm):
         gratitude_text = cleaned_data.get('gratitude_text')
         
         # Check if everything is actually empty
+        # Need to strip whitespace - don't want to accept just spaces as valid
         title_empty = not title or not title.strip()
         content_empty = not content or not content.strip()
         gratitude_empty = not gratitude_text or not gratitude_text.strip()
