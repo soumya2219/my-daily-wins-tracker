@@ -31,15 +31,18 @@
                                     <span class="badge me-2" style="background-color: {{ category.color }}; width: 20px; height: 20px;">&nbsp;</span>
                                     <h5 class="mb-0">{{ category.name }}</h5>
                                 </div>
-                                <a href="{% url 'category_delete' category.pk %}" 
-                                   class="btn btn-sm" 
+                                <button type="button"
+                                   class="btn btn-sm delete-category-btn" 
                                    style="border: none; background: transparent; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-radius: 8px; transition: all 0.3s ease;"
                                    title="Delete category"
+                                   data-category-id="{{ category.pk }}"
+                                   data-category-name="{{ category.name }}"
+                                   data-bs-toggle="modal"
+                                   data-bs-target="#deleteCategoryModal"
                                    onmouseover="this.style.boxShadow='0 4px 8px rgba(220,53,69,0.3)'; this.style.transform='translateY(-2px)';"
-                                   onmouseout="this.style.boxShadow='0 2px 4px rgba(0,0,0,0.1)'; this.style.transform='translateY(0)';"
-                                   onclick="return confirm('Are you sure you want to delete this category? This action cannot be undone.');">
+                                   onmouseout="this.style.boxShadow='0 2px 4px rgba(0,0,0,0.1)'; this.style.transform='translateY(0)';">
                                     🗑️
-                                </a>
+                                </button>
                             </div>
                             <div class="card-body">
                                 {% if category.description %}
@@ -111,4 +114,55 @@
         </div>
     </div>
 </div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-labelledby="deleteCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteCategoryModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Delete Category
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">Are you sure you want to delete the category <strong id="categoryNameToDelete"></strong>?</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Warning:</strong> This action cannot be undone. The category will be removed from all associated entries.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </button>
+                <a href="#" id="confirmDeleteBtn" class="btn btn-danger">
+                    <i class="fas fa-trash me-2"></i>Delete Category
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Handle delete button clicks to populate the modal with category info
+    document.addEventListener('DOMContentLoaded', function() {
+        const deleteButtons = document.querySelectorAll('.delete-category-btn');
+        const categoryNameSpan = document.getElementById('categoryNameToDelete');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const categoryId = this.getAttribute('data-category-id');
+                const categoryName = this.getAttribute('data-category-name');
+                
+                // Update modal content
+                categoryNameSpan.textContent = categoryName;
+                
+                // Update delete button URL
+                confirmDeleteBtn.href = `/categories/${categoryId}/delete/`;
+            });
+        });
+    });
+</script>
 {% endblock %}
