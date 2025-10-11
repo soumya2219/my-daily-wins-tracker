@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Server Error - Daily Wins Tracker{% endblock %}
+
+{% block content %}
+<div class="container text-center" style="padding-top: 80px; padding-bottom: 80px;">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 60px 40px; border-radius: 20px; box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3); color: white;">
+                
+                <!-- Large 500 with emoji -->
+                <div style="font-size: 120px; font-weight: bold; margin-bottom: 20px; font-family: 'Comfortaa', sans-serif;">
+                    5😓0
+                </div>
+                
+                <!-- Error message -->
+                <h1 style="font-size: 2rem; margin-bottom: 20px; font-family: 'Comfortaa', sans-serif;">
+                    Oops! Something Went Wrong
+                </h1>
+                
+                <p style="font-size: 1.1rem; margin-bottom: 30px; opacity: 0.95;">
+                    We've encountered a temporary hiccup, but your wins are still safe! 🛡️
+                </p>
+                
+                <!-- Helpful message -->
+                <p style="font-size: 1rem; margin-bottom: 40px; opacity: 0.9;">
+                    Our team has been notified and we're working on fixing this. Please try again in a few moments.
+                </p>
+                
+                <!-- Action buttons -->
+                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                    <a href="javascript:history.back()" class="btn btn-light btn-lg" style="font-family: 'Comfortaa', sans-serif; padding: 12px 30px; border-radius: 10px; font-weight: 500;">
+                        <i class="fas fa-arrow-left me-2"></i>Go Back
+                    </a>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'dashboard' %}" class="btn btn-outline-light btn-lg" style="font-family: 'Comfortaa', sans-serif; padding: 12px 30px; border-radius: 10px; font-weight: 500;">
+                            <i class="fas fa-calendar-week me-2"></i>Dashboard
+                        </a>
+                    {% else %}
+                        <a href="{% url 'home' %}" class="btn btn-outline-light btn-lg" style="font-family: 'Comfortaa', sans-serif; padding: 12px 30px; border-radius: 10px; font-weight: 500;">
+                            <i class="fas fa-home me-2"></i>Go Home
+                        </a>
+                    {% endif %}
+                </div>
+                
+                <!-- Encouraging message -->
+                <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid rgba(255, 255, 255, 0.3);">
+                    <p style="font-size: 0.95rem; opacity: 0.85; margin: 0;">
+                        <i class="fas fa-heart me-2"></i>
+                        Don't worry - this is just a small setback, not a loss!
+                    </p>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
