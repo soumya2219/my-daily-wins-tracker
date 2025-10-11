@@ -24,8 +24,8 @@ else:
 # -------------------------
 # Security
 # -------------------------
-# First try to load from environment, then fall back to safe defaults for development
-DEBUG = os.environ.get("DEBUG", "True").lower() in ("true", "1", "yes")
+# First try to load from environment, then fall back to FALSE for safety (production default)
+DEBUG = os.environ.get("DEBUG", "False").lower() in ("true", "1", "yes")
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 if not SECRET_KEY:
