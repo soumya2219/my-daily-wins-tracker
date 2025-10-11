@@ -40,7 +40,7 @@ HTML was validated using two methods:
 | Entry List Page | ✅ Pass | [Screenshot](documentation/testing/html/entry_list.png) | Validated by direct input |
 | Entry Detail Page | ✅ Pass | [Screenshot](documentation/testing/html/entry_detail.png) | Validated by direct input |
 | Categories Page | ✅ Pass | [Screenshot](documentation/testing/html/categories.png) | Validated by direct input |
-| 404 Error Page | ✅ Pass | [Screenshot](documentation/testing/html/404.png) | Validated by direct input |
+| 404 Error Page | ✅ Pass | [Screenshot](documentation/testing/html/404.png) | Validated by URI (`/404/`) |
 
 **Note:** Some pages required authentication and were validated using "View Page Source" → copy/paste into validator (Direct Input method).
 
