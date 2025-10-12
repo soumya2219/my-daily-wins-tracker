@@ -130,7 +130,7 @@ class Entry(models.Model):
         related_name='entries',
         help_text="Optional categories for this entry"
     )
-    
+
     class Meta:
         verbose_name_plural = "Entries"
         # Show newest entries first
