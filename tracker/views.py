@@ -311,7 +311,8 @@ def register_view(request):
 
             messages.success(
                 request,
-                f'Welcome, {username}! Your account has been created successfully.')
+                f'Welcome, {username}! Your account has been created '
+                f'successfully.')
 
             # Log them in automatically - one less step
             login(request, user)
@@ -336,7 +337,8 @@ def custom_login_view(request):
             if user is not None:
                 login(request, user)
                 messages.success(
-                    request, f'Welcome back, {username}! You are now logged in. 🎉')
+                    request,
+                    f'Welcome back, {username}! You are now logged in. 🎉')
                 return redirect('dashboard')
         else:
             messages.error(
@@ -386,8 +388,9 @@ def entry_list(request):
             pass
 
     # Search functionality
-    # Using Q objects to do OR logic - search across title, content, and gratitude
-    # icontains = case-insensitive contains (better UX than exact match)
+    # Using Q objects to do OR logic - search across title, content,
+    # and gratitude icontains = case-insensitive contains
+    # (better UX than exact match)
     search_query = request.GET.get('search')
     if search_query:
         entries = entries.filter(
@@ -396,8 +399,9 @@ def entry_list(request):
             Q(gratitude_text__icontains=search_query)
         )
 
-    # Order by entry date (newest first - the actual date the entry is for, not when it was created)
-    # distinct() removes duplicates if entry matched multiple categories
+    # Order by entry date (newest first - the actual date the entry
+    # is for, not when it was created) distinct() removes duplicates
+    # if entry matched multiple categories
     entries = entries.distinct().order_by('-entry_date')
 
     # Pagination
@@ -452,8 +456,10 @@ def entry_create(request):
                     user=request.user, entry_date=entry_date)
                 # Entry exists, redirect to edit it instead
                 messages.info(
-                    request, f'An entry already exists for {
-                        entry_date.strftime("%B %d, %Y")}. Redirecting to edit it.')
+                    request,
+                    f'An entry already exists for '
+                    f'{entry_date.strftime("%B %d, %Y")}. '
+                    f'Redirecting to edit it.')
                 return redirect('entry_edit', pk=existing_entry.pk)
             except Entry.DoesNotExist:
                 # No existing entry, safe to create
@@ -471,8 +477,10 @@ def entry_create(request):
                     user=request.user, entry_date=initial_date)
                 # Entry exists, redirect to edit it instead
                 messages.info(
-                    request, f'An entry already exists for {
-                        initial_date.strftime("%B %d, %Y")}. Redirecting to edit it.')
+                    request,
+                    f'An entry already exists for '
+                    f'{initial_date.strftime("%B %d, %Y")}. '
+                    f'Redirecting to edit it.')
                 return redirect('entry_edit', pk=existing_entry.pk)
             except Entry.DoesNotExist:
                 # No existing entry, proceed with create form
@@ -506,7 +514,8 @@ def entry_edit(request, pk):
     context = {
         'form': form,
         'entry': entry,
-        'entry_type': 'win',  # Default for display, since entry_type field no longer exists
+        # Default for display, since entry_type field no longer exists
+        'entry_type': 'win',
         'is_editing': True,
     }
     return render(request, 'tracker/entry_form.html', context)
@@ -766,10 +775,14 @@ def get_calendar_data(request):
     # Generate HTML for calendar grid
     calendar_html = ""
     for week in month_days:
-        calendar_html += '<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-bottom: 2px;">'
+        calendar_html += (
+            '<div style="display: grid; grid-template-columns: '
+            'repeat(7, 1fr); gap: 2px; margin-bottom: 2px;">')
         for day in week:
             if day == 0:
-                calendar_html += '<div class="calendar-day-compact calendar-empty-compact"></div>'
+                calendar_html += (
+                    '<div class="calendar-day-compact '
+                    'calendar-empty-compact"></div>')
             else:
                 day_date = date(year, month, day)
                 classes = ['calendar-day-compact']
@@ -789,21 +802,25 @@ def get_calendar_data(request):
                 cursor_style = ""
                 title = ""
                 if not is_future:
-                    onclick = f'onclick="handleDayClick(\'{
-                        day_date.strftime("%Y-%m-%d")}\', {
-                        str(has_entry).lower()})"'
+                    onclick = (
+                        f'onclick="handleDayClick(\''
+                        f'{day_date.strftime("%Y-%m-%d")}\', '
+                        f'{str(has_entry).lower()})"')
                     cursor_style = 'style="cursor: pointer;"'
-                    title = f'title="{
-                        "View entry" if has_entry else "Add entry"}"'
+                    title = (
+                        f'title="'
+                        f'{"View entry" if has_entry else "Add entry"}"')
                 elif is_future:
                     title = 'title="Future date"'
 
-                calendar_html += f'''
-                    <div class="{' '.join(classes)}" data-date="{day_date.strftime('%Y-%m-%d')}" {onclick} {cursor_style} {title}>
-                        {day}
-                        {'<span class="entry-dot-compact">●</span>' if has_entry else ''}
-                    </div>
-                '''
+                entry_dot = (
+                    '<span class="entry-dot-compact">●</span>'
+                    if has_entry else '')
+                calendar_html += (
+                    f'<div class="{" ".join(classes)}" '
+                    f'data-date="{day_date.strftime("%Y-%m-%d")}" '
+                    f'{onclick} {cursor_style} {title}>'
+                    f'{day}{entry_dot}</div>')
         calendar_html += '</div>'
 
     month_name = date(year, month, 1).strftime('%B %Y')
@@ -834,7 +851,8 @@ def get_day_entry(request):
                 'mood_rating': entry.mood_rating,
                 'categories': category_names if category_names else None,
                 'date': entry.entry_date.strftime('%B %d, %Y'),
-                'created_at': entry.date_created.strftime('%B %d, %Y at %I:%M %p'),
+                'created_at': entry.date_created.strftime(
+                    '%B %d, %Y at %I:%M %p'),
             }
         })
     except (Entry.DoesNotExist, ValueError):
@@ -862,7 +880,8 @@ def sticky_note_create(request):
                 'note': {
                     'id': note.id,
                     'content': note.content,
-                    'created_at': note.created_at.strftime('%B %d, %Y at %I:%M %p'),
+                    'created_at': note.created_at.strftime(
+                        '%B %d, %Y at %I:%M %p'),
                 }
             })
         else:
