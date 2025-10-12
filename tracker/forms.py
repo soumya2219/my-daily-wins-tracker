@@ -66,8 +66,9 @@ class EntryForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         """
-        Setup the form - mainly for filtering categories to only show your own ones.
-        Also sets today's date automatically for new entries.
+        Setup the form - mainly for filtering categories to only show
+        your own ones. Also sets today's date automatically for new
+        entries.
         """
         # Get the user from the view so we can filter categories
         # pop() removes it from kwargs so super().__init__ doesn't get
