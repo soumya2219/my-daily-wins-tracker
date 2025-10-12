@@ -9,7 +9,7 @@ class CustomPasswordValidator:
     Requirements: letters + numbers + 8 chars minimum.
     Removed common password check - too restrictive.
     """
-    
+
     def validate(self, password, user=None):
         """Validate password has letters and numbers"""
         if not re.search(r'[0-9]', password):
@@ -31,7 +31,7 @@ class CustomPasswordValidator:
 def validate_username(username):
     """
     Username rules - keeping it simple and clear.
-    
+
     - Letters, numbers, underscores only
     - 3-30 characters
     - No weird special characters that might break things
