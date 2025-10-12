@@ -27,12 +27,17 @@ class EntryForm(forms.ModelForm):
             }),
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'What was the highlight of your day? (e.g., "Finished presentation", "Had quality time with family")',
+                'placeholder': (
+                    'What was the highlight of your day? '
+                    '(e.g., "Finished presentation", '
+                    '"Had quality time with family")'),
                 'maxlength': 200
             }),
             'content': forms.Textarea(attrs={
                 'class': 'form-control',
-                'placeholder': 'List your wins:\n• Completed a task\n• Learned something new\n• Made a healthy choice',
+                'placeholder': (
+                    'List your wins:\n• Completed a task\n'
+                    '• Learned something new\n• Made a healthy choice'),
                 'rows': 5
             }),
             'mood_rating': forms.Select(attrs={
@@ -49,11 +54,14 @@ class EntryForm(forms.ModelForm):
         }
         help_texts = {
             'entry_date': '',  # Self-explanatory field
-            'title': '',  # Remove redundant help text - we have clear label and placeholder
-            'content': '',  # Remove redundant help text - we have the tip in the template
+            # Remove redundant help text - we have clear label and placeholder
+            'title': '',
+            # Remove redundant help text - we have the tip in the template
+            'content': '',
             'mood_rating': 'How was your overall mood today?',
             'gratitude_text': 'What are you grateful for today?',
-            'categories': ''  # Remove redundant help text - label is clear enough
+            # Remove redundant help text - label is clear enough
+            'categories': ''
         }
 
     def __init__(self, *args, **kwargs):
@@ -62,7 +70,8 @@ class EntryForm(forms.ModelForm):
         Also sets today's date automatically for new entries.
         """
         # Get the user from the view so we can filter categories
-        # pop() removes it from kwargs so super().__init__ doesn't get confused
+        # pop() removes it from kwargs so super().__init__ doesn't get
+        # confused
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
 
@@ -106,21 +115,27 @@ class EntryForm(forms.ModelForm):
         # Ensure at least some meaningful content is provided
         if title_empty and content_empty and gratitude_empty and mood_empty:
             raise ValidationError(
-                "🤔 Your entry seems to be empty! Please add at least one of the following: "
-                "a highlight, your wins/achievements, a gratitude note, or select your mood.")
+                "🤔 Your entry seems to be empty! Please add at least "
+                "one of the following: a highlight, your wins/achievements, "
+                "a gratitude note, or select your mood.")
 
         # Collect all validation errors together to avoid duplicates
         errors = {}
 
-        # Validate meaningful content length (only if something was entered)
+        # Validate meaningful content length (only if something was
+        # entered)
         if title and len(title.strip()) < 3:
-            errors['title'] = 'Highlight should be at least 3 characters long.'
+            errors['title'] = (
+                'Highlight should be at least 3 characters long.')
 
         if content and len(content.strip()) < 5:
-            errors['content'] = 'Please write at least 5 characters about your wins.'
+            errors['content'] = (
+                'Please write at least 5 characters about your wins.')
 
         if gratitude_text and len(gratitude_text.strip()) < 5:
-            errors['gratitude_text'] = 'Please write at least 5 characters about what you\'re grateful for.'
+            errors['gratitude_text'] = (
+                'Please write at least 5 characters about what you\'re '
+                'grateful for.')
 
         # Raise all errors at once if any exist
         if errors:
@@ -204,14 +219,20 @@ class CategoryForm(forms.ModelForm):
             }),
             'description': forms.Textarea(attrs={
                 'class': 'form-control',
-                'placeholder': 'Optional: describe what this category is for...',
+                'placeholder': (
+                    'Optional: describe what this category is for...'),
                 'rows': 3
             })
         }
         help_texts = {
             'name': 'Choose a clear, descriptive name for your category',
-            'color': 'Pick a color to help you visually identify this category',
-            'description': 'Optional: add more details about when to use this category'}
+            'color': (
+                'Pick a color to help you visually identify this '
+                'category'),
+            'description': (
+                'Optional: add more details about when to use this '
+                'category')
+        }
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
