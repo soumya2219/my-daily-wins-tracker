@@ -48,6 +48,7 @@
 
 .category-checkboxes .form-check-input {
     margin-right: 8px;
+}
 
 /* Modal-specific styles from entry_modal.html */
 /* Compact modal header */
@@ -193,8 +194,6 @@
 
 .category-color-preview {
     width: 20px;
-}
-    margin-top: 0;
 }
 
 .category-checkboxes .form-check-label {
