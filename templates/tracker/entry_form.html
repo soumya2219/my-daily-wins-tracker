@@ -130,6 +130,9 @@
                                         <strong>Today I was grateful for...</strong>
                                     </label>
                                     {{ form.gratitude_text }}
+                                    {% if form.gratitude_text.help_text %}
+                                        <div class="form-text" id="id_gratitude_text_helptext">{{ form.gratitude_text.help_text }}</div>
+                                    {% endif %}
                                     {% if form.gratitude_text.errors %}
                                         <div class="text-danger small">{{ form.gratitude_text.errors.0 }}</div>
                                     {% endif %}
@@ -147,7 +150,7 @@
                                 </label>
                                 {{ form.mood_rating }}
                                 {% if form.mood_rating.help_text %}
-                                    <div class="form-text">{{ form.mood_rating.help_text }}</div>
+                                    <div class="form-text" id="id_mood_rating_helptext">{{ form.mood_rating.help_text }}</div>
                                 {% endif %}
                                 {% if form.mood_rating.errors %}
                                     <div class="text-danger small">{{ form.mood_rating.errors.0 }}</div>
@@ -292,6 +295,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Check if form is completely empty
             if (!title && !content && !gratitude && !mood) {
                 // Prevent submission
+                e.preventDefault();
                 formSubmitted = false;
                 
                 // Let Django handle the validation, but add visual feedback
@@ -301,6 +305,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Reset button after 3 seconds
                 setTimeout(() => {
+                    submitButton.innerHTML = '{% if is_editing %}<i class="fas fa-save me-2"></i>Update Entry{% else %}<i class="fas fa-save me-2"></i>Save Entry{% endif %}';
+                    submitButton.classList.remove('btn-warning');
+                    submitButton.classList.add('btn-primary');
+                }, 3000);
+                
+                return;
+            }
+        });
+    }
+});
+</script>
+
 {% endblock %}
 
 {% block extra_js %}
