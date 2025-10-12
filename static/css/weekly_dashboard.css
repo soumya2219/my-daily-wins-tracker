@@ -788,6 +788,15 @@
 @media (max-width: 768px) {
     .week-container {
         padding: 0 10px;
+        overflow-x: hidden; /* Prevent horizontal scroll */
+    }
+    
+    /* Fix calendar overflow on mobile */
+    .day-card-clickable {
+        flex: 1 1 100% !important; /* Full width on mobile */
+        max-width: 100% !important; /* Remove max-width constraint */
+        min-height: 240px !important; /* Reduce min-height */
+        margin: 0 0 20px 0 !important; /* Remove horizontal margins */
     }
     
     .day-card {

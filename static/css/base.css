@@ -170,8 +170,13 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 /* Ensure navbar brand doesn't take up too much space on mobile */
 @media (max-width: 991.98px) {
     .navbar-brand {
-        font-size: 1.4rem; /* Smaller font on mobile */
-        margin-right: 1rem; /* Add some spacing from toggler */
+        font-size: 1.2rem; /* Smaller font on mobile */
+        margin-right: auto; /* Push toggler to the right */
+        flex: 1; /* Allow it to grow but not too much */
+        max-width: calc(100% - 60px); /* Leave room for toggler */
+        white-space: nowrap; /* Prevent wrapping */
+        overflow: hidden; /* Hide overflow */
+        text-overflow: ellipsis; /* Show ... if too long */
     }
     
     /* Fix navbar collapse behavior - prevent layout shift */
