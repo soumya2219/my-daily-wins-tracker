@@ -21,8 +21,10 @@ class CustomUserCreationForm(UserCreationForm):
         self.fields['password2'].widget.attrs.update({'class': 'form-control'})
 
         # Update help text
-        self.fields['username'].help_text = 'Letters, numbers and underscores only. 3-30 characters.'
-        self.fields['password1'].help_text = 'At least 8 characters with letters and numbers.'
+        self.fields['username'].help_text = (
+            'Letters, numbers and underscores only. 3-30 characters.')
+        self.fields['password1'].help_text = (
+            'At least 8 characters with letters and numbers.')
 
     def clean_username(self):
         username = self.cleaned_data.get('username')
