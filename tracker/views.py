@@ -624,8 +624,8 @@ def category_create(request):
         if form.is_valid():
             category = form.save()
             messages.success(
-                request, f'🏷️ Category "{
-                    category.name}" created!')
+                request,
+                f'🏷️ Category "{category.name}" created!')
             return redirect('category_list')
     else:
         form = CategoryForm(user=request.user)
