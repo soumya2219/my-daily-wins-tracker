@@ -151,53 +151,46 @@ Tests were run in Chrome DevTools on the deployed Heroku site.
 
 ### Desktop Results
 
-<details>
-<summary>Click to expand desktop Lighthouse results</summary>
+**Home Page:**
 
-| Page | Performance | Accessibility | Best Practices | SEO | Screenshot |
-|------|-------------|---------------|----------------|-----|------------|
-| Home Page | 95 | 98 | 100 | 100 | [Screenshot](documentation/testing/lighthouse/home_desktop.png) |
-| Registration | 96 | 97 | 100 | 100 | [Screenshot](documentation/testing/lighthouse/register_desktop.png) |
-| Login | 97 | 98 | 100 | 100 | [Screenshot](documentation/testing/lighthouse/login_desktop.png) |
-| Dashboard | 92 | 96 | 100 | 100 | [Screenshot](documentation/testing/lighthouse/dashboard_desktop.png) |
-| Entry List | 94 | 97 | 100 | 100 | [Screenshot](documentation/testing/lighthouse/entry_list_desktop.png) |
-| Entry Detail | 95 | 98 | 100 | 100 | [Screenshot](documentation/testing/lighthouse/entry_detail_desktop.png) |
-| Categories | 96 | 97 | 100 | 100 | [Screenshot](documentation/testing/lighthouse/categories_desktop.png) |
-| 404 Page | 98 | 98 | 100 | 100 | [Screenshot](documentation/testing/lighthouse/404_desktop.png) |
+![Lighthouse - Home Page Desktop](docs/images/validation/lighthouse/lighthouse-home.png)
+*Home page desktop: Excellent scores across all metrics*
 
-**Performance Notes:**
-- All pages score 90+ on performance
-- Main factors affecting performance: Bootstrap CSS/JS from CDN, Google Fonts
-- Images optimized (WebP format for header)
+**Weekly Dashboard:**
+
+![Lighthouse - Dashboard Desktop](docs/images/validation/lighthouse/lighthouse-dashboard.png)
+*Weekly dashboard desktop: Strong performance and accessibility scores*
+
+### Mobile Results
+
+**Home Page:**
+
+![Lighthouse - Home Page Mobile](docs/images/validation/lighthouse/lighthouse-mobile-home.png)
+*Home page mobile: Optimized for mobile devices*
+
+**Weekly Dashboard:**
+
+![Lighthouse - Dashboard Mobile](docs/images/validation/lighthouse/lighthouse-mobile-dashboard.png)
+*Weekly dashboard mobile: 84 Performance, 92 Accessibility, 100 Best Practices*
+
+### Performance Analysis
+
+**Desktop Performance:**
+- Home Page and Dashboard achieve excellent scores across all metrics
+- Performance optimized through efficient code and asset loading
+- Best Practices score of 100 on both pages
+
+**Mobile Performance:**
+- Home page maintains strong performance on mobile devices
+- Dashboard scores 84 for Performance, 92 for Accessibility, and 100 for Best Practices
+- Mobile scores slightly lower due to network simulation and device constraints
+- All scores within acceptable ranges for production applications
 
 **Accessibility Notes:**
 - All pages meet WCAG AA standards
 - Color contrast ratios meet requirements
 - Semantic HTML used throughout
 - ARIA labels on interactive elements
-
-</details>
-
-### Mobile Results
-
-<details>
-<summary>Click to expand mobile Lighthouse results</summary>
-
-| Page | Performance | Accessibility | Best Practices | SEO | Screenshot |
-|------|-------------|---------------|----------------|-----|------------|
-| Home Page | 88 | 98 | 100 | 100 | [Screenshot](documentation/testing/lighthouse/home_mobile.png) |
-| Registration | 89 | 97 | 100 | 100 | [Screenshot](documentation/testing/lighthouse/register_mobile.png) |
-| Login | 90 | 98 | 100 | 100 | [Screenshot](documentation/testing/lighthouse/login_mobile.png) |
-| Dashboard | 85 | 96 | 100 | 100 | [Screenshot](documentation/testing/lighthouse/dashboard_mobile.png) |
-| Entry List | 87 | 97 | 100 | 100 | [Screenshot](documentation/testing/lighthouse/entry_list_mobile.png) |
-| Entry Detail | 89 | 98 | 100 | 100 | [Screenshot](documentation/testing/lighthouse/entry_detail_mobile.png) |
-| Categories | 90 | 97 | 100 | 100 | [Screenshot](documentation/testing/lighthouse/categories_mobile.png) |
-| 404 Page | 92 | 98 | 100 | 100 | [Screenshot](documentation/testing/lighthouse/404_mobile.png) |
-
-**Mobile Performance Notes:**
-- Slightly lower scores due to mobile network simulation
-- Still achieving good scores (85+) on all pages
-- No major issues identified
 
 </details>
 
