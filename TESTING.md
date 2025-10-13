@@ -242,12 +242,12 @@ The deployed site was tested on multiple browsers to ensure consistent functiona
 <details>
 <summary>Click to expand browser compatibility results</summary>
 
-| Browser | Version | Platform | Result | Notes |
-|---------|---------|----------|--------|-------|
-| Google Chrome | 118.x | Windows 11 | ✅ Pass | Primary development browser |
-| Mozilla Firefox | 119.x | Windows 11 | ✅ Pass | All features work correctly |
-| Microsoft Edge | 118.x | Windows 11 | ✅ Pass | Chromium-based, excellent compatibility |
-| Safari | 17.x | macOS | ✅ Pass | Tested on MacBook, works as intended |
+| Browser | Platform | Result | Notes |
+|---------|----------|--------|-------|
+| Google Chrome | Desktop | ✅ Pass | All features work correctly |
+| Microsoft Edge | Desktop | ✅ Pass | Full compatibility |
+| Safari | iOS/macOS | ✅ Pass | All features work correctly |
+| Samsung Internet | Mobile | ✅ Pass | Full compatibility |
 | Safari | 16.x | iOS (iPhone) | ✅ Pass | Mobile Safari works well |
 | Chrome Mobile | Latest | Android | ✅ Pass | Tested on Samsung Galaxy |
 
