@@ -1,0 +1,45 @@
+DAILY WINS TRACKER - ALL USER STORIES
+======================================
+
+EPIC 1: USER AUTHENTICATION
+----------------------------
+- As a new user, I want to register an account so that I can start tracking my daily wins
+- As a returning user, I want to log in securely so that I can access my personal entries
+- As a user, I want to log out so that my data remains private on shared devices
+
+
+EPIC 2: DAILY ENTRY MANAGEMENT
+-------------------------------
+- As a user, I want to record my daily wins so that I can celebrate my achievements
+- As a user, I want to track my mood so that I can identify emotional patterns
+- As a user, I want to write gratitude notes so that I can maintain a positive mindset
+- As a user, I want to edit past entries so that I can correct mistakes or add details
+- As a user, I want to delete entries so that I can remove personal information if needed
+- As a logged-in user, I want to create a daily entry so that I can record my wins and gratitude
+- As a user, I want to view my entries in a weekly calendar so that I can see my progress at a glance
+
+
+EPIC 3: ORGANISATION & CATEGORIES
+----------------------------------
+- As a user, I want to create custom categories so that I can organize my wins by theme
+- As a user, I want to assign multiple categories to entries so that I can track overlapping areas
+- As a user, I want to filter entries by category so that I can review specific areas of my life
+
+
+EPIC 4: QUICK CAPTURE & STICKY NOTES
+-------------------------------------
+- As a user, I want to quickly jot down thoughts so that I don't forget fleeting ideas
+- As a user, I want to convert sticky notes to wins so that I can track completed tasks
+- As a user, I want to see my sticky notes on every page so that I remember important reminders
+- As a user, I want to use sticky notes so that I can capture quick thoughts
+
+
+EPIC 5: SEARCH & DISCOVERY
+---------------------------
+- As a user, I want to search my entries so that I can find specific wins or reflections
+- As a user, I want to browse all my entries so that I can review my journey
+- As a user, I want to see entry previews so that I can quickly scan content
+- As a user, I want to search my entries so that I can find specific content
+
+
+TOTAL: 19 UNIQUE USER STORIES ACROSS 5 EPICS

@@ -1,0 +1,182 @@
+DAILY WINS TRACKER - USER STORIES WITH ACCEPTANCE CRITERIA
+===========================================================
+
+EPIC 1: USER AUTHENTICATION
+----------------------------
+
+1. As a new user, I want to register an account so that I can save my daily entries
+   
+   Acceptance Criteria:
+   - Registration form accessible
+   - Email validation works
+   - Password requirements enforced
+   - Account created successfully
+
+2. As a returning user, I want to log in to my account so that I can access my previous entries
+   
+   Acceptance Criteria:
+   - Login form accessible
+   - Credentials validated
+   - Redirected to dashboard
+   - Previous data visible
+
+3. As a user, I want to log out so that my data remains private on shared devices
+   
+   Acceptance Criteria:
+   - Logout button accessible
+   - User session terminated
+   - Redirected appropriately
+
+
+EPIC 2: DAILY ENTRY MANAGEMENT
+-------------------------------
+
+1. As a logged-in user, I want to create a daily entry so that I can record my wins and gratitude
+   
+   Acceptance Criteria:
+   - Entry form accessible from dashboard
+   - Three-part structure visible
+   - Can save partial entries
+   - Success message shown
+
+2. As a user, I want to view my entries in a weekly calendar so that I can see my progress at a glance
+   
+   Acceptance Criteria:
+   - Dashboard shows current week
+   - Can navigate between weeks
+   - Day cards show entry previews
+   - Empty days clearly marked
+
+3. As a user, I want to track my mood so that I can identify emotional patterns
+   
+   Acceptance Criteria:
+   - Mood selection available (1-10 scale)
+   - Mood saved with entry
+   - Mood displayed on entry preview
+
+4. As a user, I want to write gratitude notes so that I can maintain a positive mindset
+   
+   Acceptance Criteria:
+   - Gratitude field available in entry form
+   - Gratitude saved with entry
+   - Gratitude displayed in entry view
+
+5. As a user, I want to edit my entries so that I can update or correct information
+   
+   Acceptance Criteria:
+   - Can reopen existing entries
+   - Form pre-populated with data
+   - Changes save correctly
+   - Success message shown
+
+6. As a user, I want to delete entries so that I can remove unwanted content
+   
+   Acceptance Criteria:
+   - Delete button available in modal
+   - Confirmation required
+   - Entry removed from system
+   - Success message shown
+
+7. As a user, I want to record my daily wins so that I can celebrate my achievements
+   
+   Acceptance Criteria:
+   - Win entry field available
+   - Multiple wins can be added
+   - Wins saved with entry
+
+
+EPIC 3: ORGANISATION & CATEGORIES
+----------------------------------
+
+1. As a user, I want to create custom categories so that I can organize my entries
+   
+   Acceptance Criteria:
+   - Category creation form accessible
+   - Can choose from 8 colors
+   - Categories saved per user
+   - Success message shown
+
+2. As a user, I want to assign multiple categories to entries so that I can track overlapping areas
+   
+   Acceptance Criteria:
+   - Multiple category selection available
+   - Categories displayed on entry
+   - Categories can be modified
+
+3. As a user, I want to filter entries by category so that I can review specific areas of my life
+   
+   Acceptance Criteria:
+   - Category filter available
+   - Filtered results display correctly
+   - Can clear filters
+
+
+EPIC 4: QUICK CAPTURE & STICKY NOTES
+-------------------------------------
+
+1. As a user, I want to use sticky notes so that I can capture quick thoughts
+   
+   Acceptance Criteria:
+   - Can create up to 6 notes
+   - Notes editable inline
+   - Can mark as complete
+   - Can convert to entry
+
+2. As a user, I want to quickly jot down thoughts so that I don't forget fleeting ideas
+   
+   Acceptance Criteria:
+   - Sticky note creation quick and accessible
+   - Notes visible on every page
+   - Notes persist across sessions
+
+3. As a user, I want to convert sticky notes to wins so that I can track completed tasks
+   
+   Acceptance Criteria:
+   - Convert button available on completed notes
+   - Note content added to entry
+   - Note removed after conversion
+
+4. As a user, I want to see my sticky notes on every page so that I remember important reminders
+   
+   Acceptance Criteria:
+   - Sticky notes visible on all authenticated pages
+   - Notes display persistently
+   - Notes can be accessed anywhere
+
+
+EPIC 5: SEARCH & DISCOVERY
+---------------------------
+
+1. As a user, I want to search my entries so that I can find specific content
+   
+   Acceptance Criteria:
+   - Search form accessible
+   - Searches all entry fields
+   - Results displayed clearly
+   - No results message shown
+
+2. As a user, I want to browse all my entries so that I can review my journey
+   
+   Acceptance Criteria:
+   - Entry list page accessible
+   - Pagination available (10 per page)
+   - Entries displayed chronologically
+
+3. As a user, I want to see entry previews so that I can quickly scan content
+   
+   Acceptance Criteria:
+   - Preview shows key information
+   - Preview displays on dashboard
+   - Full entry accessible from preview
+
+
+SUMMARY
+-------
+Total: 19 unique user stories across 5 Epics
+All stories tested and validated (see TESTING.md)
+
+Epic 1: User Authentication (3 stories)
+Epic 2: Daily Entry Management (7 stories)
+Epic 3: Organisation & Categories (3 stories)
+Epic 4: Quick Capture & Sticky Notes (4 stories)
+Epic 5: Search & Discovery (3 stories)
