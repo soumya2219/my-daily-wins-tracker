@@ -247,9 +247,6 @@ The deployed site was tested on multiple browsers to ensure consistent functiona
 **Cross-Browser Issues:**
 - None identified - site works consistently across all tested browsers
 
-**Screenshots:**
-[Placeholder for browser compatibility screenshots]
-
 </details>
 
 ---
