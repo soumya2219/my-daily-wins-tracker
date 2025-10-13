@@ -1,0 +1,45 @@
+All User Stories for Daily Wins Tracker (Simple List)
+======================================================
+
+1. As a new user, I want to register an account so that I can start tracking my daily wins
+
+2. As a returning user, I want to log in securely so that I can access my personal entries
+
+3. As a user, I want to log out so that my data remains private on shared devices
+
+4. As a user, I want to record my daily wins so that I can celebrate my achievements
+
+5. As a user, I want to track my mood so that I can identify emotional patterns
+
+6. As a user, I want to write gratitude notes so that I can maintain a positive mindset
+
+7. As a user, I want to edit past entries so that I can correct mistakes or add details
+
+8. As a user, I want to delete entries so that I can remove personal information if needed
+
+9. As a logged-in user, I want to create a daily entry so that I can record my wins and gratitude
+
+10. As a user, I want to view my entries in a weekly calendar so that I can see my progress at a glance
+
+11. As a user, I want to create custom categories so that I can organize my wins by theme
+
+12. As a user, I want to assign multiple categories to entries so that I can track overlapping areas
+
+13. As a user, I want to filter entries by category so that I can review specific areas of my life
+
+14. As a user, I want to quickly jot down thoughts so that I don't forget fleeting ideas
+
+15. As a user, I want to convert sticky notes to wins so that I can track completed tasks
+
+16. As a user, I want to see my sticky notes on every page so that I remember important reminders
+
+17. As a user, I want to use sticky notes so that I can capture quick thoughts
+
+18. As a user, I want to search my entries so that I can find specific wins or reflections
+
+19. As a user, I want to browse all my entries so that I can review my journey
+
+20. As a user, I want to see entry previews so that I can quickly scan content
+
+---
+Total: 19 unique user stories
