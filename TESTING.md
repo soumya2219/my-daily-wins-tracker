@@ -32,15 +32,13 @@ HTML was validated using two methods:
 
 | Page | Result | Evidence | Notes |
 |------|--------|----------|-------|
-| Home Page (Unauthenticated) | ✅ Pass | [Screenshot](documentation/testing/html/home.png) | Validated by direct input |
-| Home Page (Authenticated) | ✅ Pass | [Screenshot](documentation/testing/html/home_auth.png) | Validated by direct input |
-| Registration Page | ✅ Pass | [Screenshot](documentation/testing/html/register.png) | Validated by URI |
-| Login Page | ✅ Pass | [Screenshot](documentation/testing/html/login.png) | Validated by URI |
-| Weekly Dashboard | ✅ Pass | [Screenshot](documentation/testing/html/dashboard.png) | Validated by direct input |
-| Entry List Page | ✅ Pass | [Screenshot](documentation/testing/html/entry_list.png) | Validated by direct input |
-| Entry Detail Page | ✅ Pass | [Screenshot](documentation/testing/html/entry_detail.png) | Validated by direct input |
-| Categories Page | ✅ Pass | [Screenshot](documentation/testing/html/categories.png) | Validated by direct input |
-| 404 Error Page | ✅ Pass | [Screenshot](documentation/testing/html/404.png) | Validated by URI (`/404/`) |
+| Home Page | ✅ Pass | [Screenshot](docs/images/validation/html/html-home.png) | Validated by direct input |
+| Registration Page | ✅ Pass | [Screenshot](docs/images/validation/html/html-register.png) | Validated by URI |
+| Login Page | ✅ Pass | [Screenshot](docs/images/validation/html/html-login.png) | Validated by URI |
+| Weekly Dashboard | ✅ Pass | [Screenshot](docs/images/validation/html/html-dashboard.png) | Validated by direct input |
+| Entry List Page | ✅ Pass | [Screenshot](docs/images/validation/html/html-entries.png) | Validated by direct input |
+| New Entry Page | ✅ Pass | [Screenshot](docs/images/validation/html/html-new-entry.png) | Validated by direct input |
+| Categories Page | ✅ Pass | [Screenshot](docs/images/validation/html/html-categories.png) | Validated by direct input |
 
 **Note:** Some pages required authentication and were validated using "View Page Source" → copy/paste into validator (Direct Input method).
 
@@ -57,11 +55,12 @@ CSS was validated by direct input (copying the CSS file content).
 <details>
 <summary>Click to expand CSS validation results</summary>
 
-| File | Result | Evidence | Warnings |
-|------|--------|----------|----------|
-| `static/css/base.css` | ✅ Pass | [Screenshot](documentation/testing/css/base.png) | [Warnings](documentation/testing/css/base_warnings.png) - Vendor prefixes, imported stylesheets |
-| `static/css/home.css` | ✅ Pass | [Screenshot](documentation/testing/css/home.png) | None |
-| `static/css/weekly_dashboard.css` | ✅ Pass | [Screenshot](documentation/testing/css/dashboard.png) | None |
+| File | Result | Evidence |
+|------|--------|----------|
+| `static/css/base.css` | ✅ Pass | [Screenshot](docs/images/validation/css/base-css.png) |
+| `static/css/home.css` | ✅ Pass | [Screenshot](docs/images/validation/css/home-css.png) |
+| `static/css/weekly_dashboard.css` | ✅ Pass | [Screenshot](docs/images/validation/css/weekly-dashboard-css.png) |
+| `static/css/forms.css` | ✅ Pass | [Screenshot](docs/images/validation/css/forms-css.png) |
 
 **Common Warnings (Expected):**
 - Imported style sheets (Bootstrap, Google Fonts) are not checked in direct CSS input mode
@@ -84,9 +83,10 @@ Configuration used:
 <details>
 <summary>Click to expand JavaScript validation results</summary>
 
-| File | Result | Evidence | Metrics | Notes |
-|------|--------|----------|---------|-------|
-| `static/js/weekly_dashboard.js` | ✅ Pass | [Screenshot](documentation/testing/js/dashboard.png) | 1451 lines, 45 functions | No errors, minor warnings about undefined variables from DOM |
+| File | Result | Evidence |
+|------|--------|----------|
+| `static/js/weekly_dashboard.js` | ✅ Pass | [Screenshot](docs/images/validation/javascript/weekly-dashboard-js.png) |
+| `static/js/forms.js` | ✅ Pass | [Screenshot](docs/images/validation/javascript/forms-js.png) |
 
 **Warnings Addressed:**
 - Undefined variables from DOM (e.g., `document`, `window`, `fetch`) - these are browser globals
@@ -105,39 +105,19 @@ All Python files were validated for PEP8 compliance.
 <details>
 <summary>Click to expand Python validation results</summary>
 
-#### Config App
 
-| File | Result | Evidence | Notes |
-|------|--------|----------|-------|
-| `config/settings.py` | ✅ Pass | [Screenshot](documentation/testing/python/config_settings.png) | Line length adjusted for long URLs |
-| `config/urls.py` | ✅ Pass | [Screenshot](documentation/testing/python/config_urls.png) | No errors |
-| `config/wsgi.py` | ✅ Pass | [Screenshot](documentation/testing/python/config_wsgi.png) | No errors |
-| `config/asgi.py` | ✅ Pass | [Screenshot](documentation/testing/python/config_asgi.png) | No errors |
 
 #### Tracker App
 
-| File | Result | Evidence | Notes |
-|------|--------|----------|-------|
-| `tracker/models.py` | ✅ Pass | [Screenshot](documentation/testing/python/tracker_models.png) | No errors |
-| `tracker/views.py` | ✅ Pass | [Screenshot](documentation/testing/python/tracker_views.png) | No errors |
-| `tracker/forms.py` | ✅ Pass | [Screenshot](documentation/testing/python/tracker_forms.png) | No errors |
-| `tracker/urls.py` | ✅ Pass | [Screenshot](documentation/testing/python/tracker_urls.png) | No errors |
-| `tracker/admin.py` | ✅ Pass | [Screenshot](documentation/testing/python/tracker_admin.png) | No errors |
-| `tracker/validators.py` | ✅ Pass | [Screenshot](documentation/testing/python/tracker_validators.png) | No errors |
-| `tracker/auth_forms.py` | ✅ Pass | [Screenshot](documentation/testing/python/tracker_auth_forms.png) | No errors |
-| `tracker/apps.py` | ✅ Pass | [Screenshot](documentation/testing/python/tracker_apps.png) | No errors |
-
-#### Template Tags
-
-| File | Result | Evidence | Notes |
-|------|--------|----------|-------|
-| `tracker/templatetags/win_filters.py` | ✅ Pass | [Screenshot](documentation/testing/python/templatetags_win_filters.png) | No errors |
-
-#### Root Files
-
-| File | Result | Evidence | Notes |
-|------|--------|----------|-------|
-| `manage.py` | ✅ Pass | [Screenshot](documentation/testing/python/manage.png) | No errors |
+| File | Result | Evidence |
+|------|--------|----------|
+| `tracker/models.py` | ✅ Pass | [Screenshot](docs/images/validation/python/models-pylinter.png) |
+| `tracker/views.py` | ✅ Pass | [Screenshot](docs/images/validation/python/views-pylinter.png) |
+| `tracker/forms.py` | ✅ Pass | [Screenshot](docs/images/validation/python/forms-pylinter.png) |
+| `tracker/urls.py` | ✅ Pass | [Screenshot](docs/images/validation/python/urls-pylinter.png) |
+| `tracker/admin.py` | ✅ Pass | [Screenshot](docs/images/validation/python/admin-pylinter.png) |
+| `tracker/validators.py` | ✅ Pass | [Screenshot](docs/images/validation/python/validators-pylinter.png) |
+| `tracker/auth_forms.py` | ✅ Pass | [Screenshot](docs/images/validation/python/auth-forms-pylinter.png) |
 
 </details>
 
