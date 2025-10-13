@@ -208,9 +208,6 @@ The site was tested for responsiveness using Chrome DevTools across multiple dev
 | Footer | ✅ Centered | ✅ Centered | ✅ Centered |
 | Images | ✅ Responsive | ✅ Responsive | ✅ Responsive |
 
-**Screenshots/GIFs:**
-[Placeholder for responsiveness GIF showing site at different breakpoints]
-
 </details>
 
 ---
